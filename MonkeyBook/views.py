@@ -8,8 +8,9 @@ import os
 @app.route('/')
 def index():
     if 'email' in session:
-        return 'Logged in as %s' % escape(session['email'])
-    return 'You are not logged in'
+        monkey = Monkey.query.filter_by(email = session['email']).first()
+        return render_template('profile.html', monkey = monkey)
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

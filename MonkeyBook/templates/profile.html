@@ -1,0 +1,43 @@
+{% block content %}
+
+<div id="welcome">
+    Welcome, {{ monkey.first_name }} {{ monkey.last_name }}!
+    <a id="logout_link" href="/logout">Log out</a>
+</div>
+
+{% if monkey.best_friend %}
+<div id="best_friend">
+    Your best friend is {{ monkey.best_friend.first_name }} {{ monkey.best_friend.last_name }}
+</div>
+{% endif %}
+
+<div id="friends">
+    <p>Friends:</p>
+    <ul>
+        {% for friend in monkey.friends %}
+            <li>{{ friend.first_name }} {{ friend.last_name }}, {{ friend.age() }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div id="mutual_friends">
+    <p>Mutual friends:</p>
+    <ul>
+        {% for friend in monkey.friends %}
+            {% if monkey in friend.friends %}
+                <li>{{ friend.first_name }} {{ friend.last_name }}, {{ friend.age() }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+
+<div id="friend_of">
+    <p>Friend of:</p>
+    <ul>
+        {% for friend in monkey.friend_of %}
+            <li>{{ friend.first_name }} {{ friend.last_name }}, {{ friend.age() }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}

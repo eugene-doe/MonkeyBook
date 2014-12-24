@@ -20,7 +20,7 @@ class Monkey(db.Model):
     date_of_birth = db.Column(db.Date)
 
     best_friend_id = db.Column(db.Integer, db.ForeignKey('monkey.id', ondelete='SET NULL'))
-    bestFriend = db.relationship('Monkey', uselist=False, remote_side=[id])
+    best_friend = db.relationship('Monkey', uselist=False, remote_side=[id])
 
     friends = db.relationship('Monkey',
                         secondary=friendship,
@@ -37,14 +37,17 @@ class Monkey(db.Model):
 
     def age(self):
         if self.date_of_birth is not None:
-            bdate = parser.parse(self.date_of_birth).date()
+            if type(self.date_of_birth) is str:
+                bdate = parser.parse(self.date_of_birth).date()
+            else:
+                bdate = self.date_of_birth
             today = date.today()
             return today.year - bdate.year - ((today.month, today.day) < (bdate.month, bdate.day))
         else:
-            return None
+            return ''
 
     def __repr__(self):
-        if self.age() is not None:
+        if self.age():
             return '{0} {1} ({2})'.format(self.first_name, self.last_name, self.age())
         else:
             return '{0} {1}'.format(self.first_name, self.last_name)
