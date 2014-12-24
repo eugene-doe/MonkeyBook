@@ -15,7 +15,7 @@
     <p>Friends:</p>
     <ul>
         {% for friend in monkey.friends %}
-            <li>{{ friend.first_name }} {{ friend.last_name }}, {{ friend.age() }}</li>
+            <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
         {% endfor %}
     </ul>
 </div>
@@ -25,7 +25,7 @@
     <ul>
         {% for friend in monkey.friends %}
             {% if monkey in friend.friends %}
-                <li>{{ friend.first_name }} {{ friend.last_name }}, {{ friend.age() }}</li>
+                <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
             {% endif %}
         {% endfor %}
     </ul>
@@ -35,7 +35,7 @@
     <p>Friend of:</p>
     <ul>
         {% for friend in monkey.friend_of %}
-            <li>{{ friend.first_name }} {{ friend.last_name }}, {{ friend.age() }}</li>
+            <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
         {% endfor %}
     </ul>
 </div>

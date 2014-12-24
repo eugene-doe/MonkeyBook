@@ -33,18 +33,17 @@ class Monkey(db.Model):
         self.last_name = last_name
         self.password = password
         self.email = email
-        if date_of_birth is not None: self.date_of_birth = date_of_birth
+        if date_of_birth: self.date_of_birth = date_of_birth # False if None or empty string
 
     def age(self):
-        if self.date_of_birth is not None:
+        # date_of_birth is a string before commit and a date object afterwards, therefore:
+        if self.date_of_birth:
             if type(self.date_of_birth) is str:
                 bdate = parser.parse(self.date_of_birth).date()
             else:
                 bdate = self.date_of_birth
             today = date.today()
             return today.year - bdate.year - ((today.month, today.day) < (bdate.month, bdate.day))
-        else:
-            return ''
 
     def __repr__(self):
         if self.age():
