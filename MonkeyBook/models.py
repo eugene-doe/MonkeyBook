@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_utils.types.password import PasswordType
 from datetime import date
+from dateutil import parser
 
 db = SQLAlchemy()
 
@@ -12,8 +13,9 @@ class Monkey(db.Model):
     __tablename__ = 'monkey' # optional in Flask-SQLAlchemy, but included for clarity
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(PasswordType(schemes=['pbkdf2_sha512', 'md5_crypt'], deprecated=['md5_crypt']))
+    first_name = db.Column(db.String(80), nullable=False)
+    last_name = db.Column(db.String(80), nullable=False)
+    password = db.Column(PasswordType(schemes=['pbkdf2_sha512', 'md5_crypt'], deprecated=['md5_crypt']), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     date_of_birth = db.Column(db.Date)
 
@@ -26,15 +28,16 @@ class Monkey(db.Model):
                         secondaryjoin=id == friendship.c.right_monkey_id,
                         backref='friend_of') # backref=db.backref('friendOf', lazy='dynamic') for large collections
     
-    def __init__(self, name, password, email, date_of_birth=None):
-        self.name = name
+    def __init__(self, first_name, last_name, password, email, date_of_birth=None):
+        self.first_name = first_name
+        self.last_name = last_name
         self.password = password
         self.email = email
         if date_of_birth is not None: self.date_of_birth = date_of_birth
 
     def age(self):
         if self.date_of_birth is not None:
-            bdate = self.date_of_birth
+            bdate = parser.parse(self.date_of_birth).date()
             today = date.today()
             return today.year - bdate.year - ((today.month, today.day) < (bdate.month, bdate.day))
         else:
@@ -42,6 +45,6 @@ class Monkey(db.Model):
 
     def __repr__(self):
         if self.age() is not None:
-            return '{0} ({1})'.format(self.name, self.age())
+            return '{0} {1} ({2})'.format(self.first_name, self.last_name, self.age())
         else:
-            return '{0}'.format(self.name)
+            return '{0} {1}'.format(self.first_name, self.last_name)

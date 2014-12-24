@@ -6,9 +6,9 @@ from MonkeyBook.models import Monkey
 db.drop_all()
 db.create_all()
 
-jack = Monkey('Jack', '123', 'jack@email.com', '1980-02-03')
-jill = Monkey('Jill', '321', 'jill@email.com')
-john = Monkey('John', '456', 'john@email.com', '1981-10-19')
+jack = Monkey('Jack', 'Jones', '123', 'jack@email.com', '1980-02-03')
+jill = Monkey('Jill', 'Jones','321', 'jill@email.com')
+john = Monkey('John', 'Doe', '456', 'john@email.com', '1981-10-19')
 
 jack.friends.append(jill)
 jill.friends.append(jack)
