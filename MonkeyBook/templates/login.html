@@ -1,0 +1,18 @@
+{% block content %}
+
+<form method="post">
+    <p>{{ form.name.label }}: {{ form.name() }}</p>
+    <p>{{ form.password.label }}: {{ form.password() }}</p>
+
+    {% if form.name.errors %}
+        <ul class="errors">{% for error in form.name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if form.password.errors %}
+        <ul class="errors">{% for error in form.password.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    <p><input type="submit" value="Login"></p>
+</form>
+
+{% endblock %}
