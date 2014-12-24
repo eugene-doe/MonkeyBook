@@ -9,8 +9,21 @@ import os
 def index():
     if 'email' in session:
         monkey = Monkey.query.filter_by(email = session['email']).first()
-        return render_template('profile.html', monkey = monkey)
-    return redirect(url_for('login'))
+
+        # The following lists keep logic out of the templates
+        # and keep the model simple at the same time:
+
+        mutual_friends = set(monkey.friends).intersection(monkey.friend_of)
+        other_friends = set(monkey.friends).difference(monkey.friend_of)
+        also_friend_of = set(monkey.friend_of).difference(monkey.friends)
+
+        return render_template('profile.html',
+                               monkey=monkey,
+                               mutual_friends=mutual_friends,
+                               other_friends=other_friends,
+                               also_friend_of=also_friend_of)
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -32,7 +45,7 @@ def login():
     if 'email' in session:
         return redirect(url_for('index'))
     else: 
-        return render_template('login.html', form = form)
+        return render_template('login.html', form=form)
 
 @app.route('/logout')
 def logout():

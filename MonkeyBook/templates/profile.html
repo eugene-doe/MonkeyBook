@@ -11,33 +11,41 @@
 </div>
 {% endif %}
 
-<div id="friends">
-    <p>Friends:</p>
-    <ul>
-        {% for friend in monkey.friends %}
-            <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
-        {% endfor %}
-    </ul>
-</div>
-
+{% if mutual_friends %}
 <div id="mutual_friends">
     <p>Mutual friends:</p>
     <ul>
-        {% for friend in monkey.friends %}
-            {% if monkey in friend.friends %}
-                <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-</div>
-
-<div id="friend_of">
-    <p>Friend of:</p>
-    <ul>
-        {% for friend in monkey.friend_of %}
+        {% for friend in mutual_friends|sort(attribute='first_name') %}
             <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
         {% endfor %}
     </ul>
 </div>
+{% endif %}
+
+{% if other_friends %}
+<div id="other_friends">
+    {% if mutual_friends %}
+        <p>Other friends:</p>
+    {% else %}
+        <p>Your friends:</p>
+    {% endif %}
+    <ul>
+        {% for friend in other_friends|sort(attribute='first_name') %}
+            <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if also_friend_of %}
+<div id="also_friend_of">
+    <p>Also friend of:</p>
+    <ul>
+        {% for friend in also_friend_of|sort(attribute='first_name') %}
+            <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
 
 {% endblock %}
