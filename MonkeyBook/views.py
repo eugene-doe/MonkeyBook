@@ -15,6 +15,7 @@ import os
 ## are viewing) as 'monkey'.
 
 def login_required(f):
+    """Redirect to login page if not logged in."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not 'id' in session:
@@ -25,6 +26,7 @@ def login_required(f):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Log in to MonkeyBook."""
     form = LoginForm(request.form)
 
     if request.method == 'POST' and form.validate():
@@ -49,12 +51,14 @@ def login():
 
 @app.route('/logout')
 def logout():
+    """Log out of MonkeyBook."""
     # Remove the id from the session if it's there
     session.pop('id', None)
     return redirect(url_for('index'))
 
 @app.route('/')
 def index():
+    """Display the index page, logged in or not."""
     monkey_self = None
     if 'id' in session:
         monkey_self = Monkey.query.filter_by(id = session['id']).first()
@@ -63,6 +67,7 @@ def index():
 @app.route('/<int:monkey_id>')
 @login_required
 def profile(monkey_id):
+    """Display a monkey's profile, own or not."""
     monkey_self = Monkey.query.filter_by(id = session['id']).first()
 
     if monkey_id == session['id']:
@@ -75,9 +80,12 @@ def profile(monkey_id):
     # The following lists keep logic out of the templates
     # and keep the model simple at the same time:
 
-    mutual_friends = set(monkey.friends).intersection(monkey.friend_of)
-    other_friends = set(monkey.friends).difference(monkey.friend_of)
-    also_friend_of = set(monkey.friend_of).difference(monkey.friends)
+    if (monkey):
+        mutual_friends = set(monkey.friends).intersection(monkey.friend_of)
+        other_friends = set(monkey.friends).difference(monkey.friend_of)
+        also_friend_of = set(monkey.friend_of).difference(monkey.friends)
+    else:
+        return redirect(url_for('index'))
 
     return render_template('profile.html',
                             monkey=monkey,
@@ -86,9 +94,12 @@ def profile(monkey_id):
                             other_friends=other_friends,
                             also_friend_of=also_friend_of)
 
+
+
 @app.route('/edit', methods=['GET', 'POST'])
 @login_required
 def edit():
+    """Edit monkey's own profile."""
     monkey_self = Monkey.query.filter_by(id = session['id']).first()
 
     # If no formdata is present in the request, the form is populated from the object:
@@ -127,6 +138,39 @@ def edit():
                            monkey_self=monkey_self,
                            edit_result=edit_result,
                            edit_result_class=edit_result_class)
+
+@app.route('/add/<int:monkey_id>')
+@login_required
+def add(monkey_id):
+    """Add a monkey to friends."""
+    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+    monkey = Monkey.query.filter_by(id = monkey_id).first()
+
+    if (monkey is not monkey_self and monkey not in monkey_self.friends):
+        monkey_self.friends.append(monkey)
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.close()
+
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/remove/<int:monkey_id>')
+@login_required
+def remove(monkey_id):
+    """Remove a monkey from friends."""
+    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+    monkey = Monkey.query.filter_by(id = monkey_id).first()
+
+    if (monkey in monkey_self.friends):
+        monkey_self.friends.remove(monkey)
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.close()
+
+    return redirect(request.referrer or url_for('index'))
+
 
 # Randomly generated secret key
 app.secret_key = os.urandom(24)

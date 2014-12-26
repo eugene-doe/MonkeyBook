@@ -19,15 +19,15 @@
         {% if monkey == monkey_self %}
             <p>That's you!</p>
         {% elif monkey == monkey_self.best_friend %}
-            <p>{{ monkey.first_name }} {{ monkey.last_name }} is your best friend. <a href="#" class="change_friendship">Not best anymore</a> | <a href="#" class="change_friendship">Unfriend</a></p>
+            <p>{{ monkey.first_name }} {{ monkey.last_name }} is your best friend. <a href="#" class="change_friendship">Not best anymore</a> | <a href="{{ url_for('remove', monkey_id=monkey.id) }}" class="change_friendship">Unfriend</a></p>
         {% elif monkey in monkey_self.friends and monkey in monkey_self.friend_of %}
-            <p>{{ monkey.first_name }} {{ monkey.last_name }} is your mutual friend. <a href="#" class="change_friendship">Make best friend</a> | <a href="#" class="change_friendship">Unfriend</a></p>
+            <p>{{ monkey.first_name }} {{ monkey.last_name }} is your mutual friend. <a href="#" class="change_friendship">Make best friend</a> | <a href="{{ url_for('remove', monkey_id=monkey.id) }}" class="change_friendship">Unfriend</a></p>
         {% elif monkey in monkey_self.friends %}
-            <p>{{ monkey.first_name }} {{ monkey.last_name }} is your friend. <a href="#" class="change_friendship">Make best friend</a> | <a href="#" class="change_friendship">Unfriend</a></p>
+            <p>{{ monkey.first_name }} {{ monkey.last_name }} is your friend. <a href="#" class="change_friendship">Make best friend</a> | <a href="{{ url_for('remove', monkey_id=monkey.id) }}" class="change_friendship">Unfriend</a></p>
         {% elif monkey in monkey_self.friend_of %}
-            <p>{{ monkey.first_name }} {{ monkey.last_name }} would like to be your friend. <a href="#" class="change_friendship">Add friend</a></p>
+            <p>{{ monkey.first_name }} {{ monkey.last_name }} would like to be your friend. <a href="{{ url_for('add', monkey_id=monkey.id) }}" class="change_friendship">Add friend</a></p>
         {% else %}
-            <p>{{ monkey.first_name }} {{ monkey.last_name }} is not your friend yet. <a href="#" class="change_friendship">Add friend</a></p>
+            <p>{{ monkey.first_name }} {{ monkey.last_name }} is not your friend yet. <a href="{{ url_for('add', monkey_id=monkey.id) }}" class="change_friendship">Add friend</a></p>
         {% endif %}
     </div>
 

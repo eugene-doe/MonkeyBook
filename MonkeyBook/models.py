@@ -36,6 +36,7 @@ class Monkey(db.Model):
         if date_of_birth: self.date_of_birth = date_of_birth # False if None or empty string
 
     def age(self):
+        """Calculate monkey's age from date of birth."""
         # date_of_birth is a string before commit and a date object afterwards, therefore:
         if self.date_of_birth:
             if type(self.date_of_birth) is str:
