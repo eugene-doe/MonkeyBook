@@ -51,6 +51,7 @@
   <ItemGroup>
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
+    <Content Include="MonkeyBook\templates\delete.html" />
     <Content Include="MonkeyBook\templates\layout.html" />
     <Content Include="MonkeyBook\templates\edit.html" />
     <Content Include="MonkeyBook\templates\index.html" />

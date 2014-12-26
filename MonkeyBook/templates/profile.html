@@ -23,7 +23,7 @@
         </p>
 
         {% if monkey == monkey_self %}
-            <p>That's you!</p>
+            <p>That's you! | <a href="{{ url_for('delete') }}" class="change_friendship">Delete profile</a></p>
         {% elif monkey == monkey_self.best_friend %}
             <p>{{ monkey.first_name }} {{ monkey.last_name }} is your best friend. <a href="{{ url_for('clear_best') }}" class="change_friendship">Not best anymore</a> | <a href="{{ url_for('remove', monkey_id=monkey.id) }}" class="change_friendship">Unfriend</a></p>
         {% elif monkey in monkey_self.friends and monkey in monkey_self.friend_of %}

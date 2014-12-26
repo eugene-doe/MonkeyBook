@@ -96,6 +96,23 @@ def register():
                            form=form,
                            monkey_self=monkey_self)
 
+@app.route('/delete')
+@app.route('/delete/<confirmed>')
+@login_required
+def delete(confirmed=None):
+    """Delete monkey's profile."""
+    if confirmed == 'confirmed':
+        monkey_self = Monkey.query.filter_by(id = session['id']).first()
+        db.session.delete(monkey_self)
+        try:
+            db.session.commit()
+            session.pop('id', None)
+        except Exception:
+            db.session.close()
+        return redirect(url_for('index'))
+    else:
+        return render_template('delete.html')
+
 @app.route('/')
 def index():
     """Display the index page, logged in or not."""
