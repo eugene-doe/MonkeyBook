@@ -80,7 +80,7 @@ def profile(monkey_id):
     # The following lists keep logic out of the templates
     # and keep the model simple at the same time:
 
-    if (monkey):
+    if monkey:
         mutual_friends = set(monkey.friends).intersection(monkey.friend_of)
         other_friends = set(monkey.friends).difference(monkey.friend_of)
         also_friend_of = set(monkey.friend_of).difference(monkey.friends)
@@ -146,7 +146,8 @@ def add(monkey_id):
     monkey_self = Monkey.query.filter_by(id = session['id']).first()
     monkey = Monkey.query.filter_by(id = monkey_id).first()
 
-    if (monkey is not monkey_self and monkey not in monkey_self.friends):
+    # If monkey exists, is not you and is not your friend already:
+    if monkey and monkey is not monkey_self and monkey not in monkey_self.friends:
         monkey_self.friends.append(monkey)
         try:
             db.session.commit()
@@ -162,7 +163,11 @@ def remove(monkey_id):
     monkey_self = Monkey.query.filter_by(id = session['id']).first()
     monkey = Monkey.query.filter_by(id = monkey_id).first()
 
-    if (monkey in monkey_self.friends):
+    # Only a friend can be the best friend:
+    if monkey is monkey_self.best_friend:
+        monkey_self.best_friend = None
+
+    if monkey in monkey_self.friends:
         monkey_self.friends.remove(monkey)
         try:
             db.session.commit()
@@ -171,6 +176,35 @@ def remove(monkey_id):
 
     return redirect(request.referrer or url_for('index'))
 
+@app.route('/best/<int:monkey_id>')
+@login_required
+def best(monkey_id):
+    """Make a monkey your best friend."""
+    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+    monkey = Monkey.query.filter_by(id = monkey_id).first()
+
+    if monkey is not monkey_self:
+        monkey_self.best_friend = monkey
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.close()
+
+    return redirect(request.referrer or url_for('index'))
+
+@app.route('/clear_best')
+@login_required
+def clear_best():
+    """Clear your best friend."""
+    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+
+    monkey_self.best_friend = None
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.close()
+
+    return redirect(request.referrer or url_for('index'))
 
 # Randomly generated secret key
 app.secret_key = os.urandom(24)
