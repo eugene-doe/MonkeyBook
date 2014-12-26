@@ -56,6 +56,46 @@ def logout():
     session.pop('id', None)
     return redirect(url_for('index'))
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """Register a new monkey."""
+    if 'id' in session:
+        return redirect(url_for('index'))
+
+    monkey_self = None
+
+    form = ProfileEditForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+        # Check for email uniqueness by querying for another monkey with the same address:
+        if not Monkey.query.filter(func.lower(Monkey.email) == func.lower(request.form['email'])).first():
+
+            # If no duplicate found, create the monkey object and commit:
+            monkey_self = Monkey(request.form['first_name'],
+                                 request.form['last_name'],
+                                 request.form['password'],
+                                 request.form['email'])
+
+            try:
+                if request.form['date_of_birth'] == '':
+                    # Handling empty birth dates:
+                    monkey_self.date_of_birth = None
+                else:
+                    # Handling different date formats:
+                    monkey_self.date_of_birth = parser.parse(request.form['date_of_birth']).date()
+                db.session.add(monkey_self)
+                db.session.commit()
+                session['id'] = monkey_self.id
+                return redirect(url_for('index'))
+            except Exception:
+                db.session.close()
+        else:
+            form.email.errors.append('This e-mail address is registered with another user')
+
+    return render_template('edit.html',
+                           form=form,
+                           monkey_self=monkey_self)
+
 @app.route('/')
 def index():
     """Display the index page, logged in or not."""
@@ -93,8 +133,6 @@ def profile(monkey_id):
                             mutual_friends=mutual_friends,
                             other_friends=other_friends,
                             also_friend_of=also_friend_of)
-
-
 
 @app.route('/edit', methods=['GET', 'POST'])
 @login_required

@@ -6,6 +6,6 @@
         <p>Go to your <a href="{{ url_for('profile', monkey_id=monkey_self.id) }}">profile</a> to see your friends.</p>
     {% else %}
         <h2>Welcome to MonkeyBook!</h2>
-        <p>Please <a href="{{ url_for('login') }}">log in</a> to use the service.</p>
+        <p>Please <a href="{{ url_for('login') }}">log in</a> or <a href="{{ url_for('register') }}">register</a> to use the service.</p>
     {% endif %}
 {% endblock %}
