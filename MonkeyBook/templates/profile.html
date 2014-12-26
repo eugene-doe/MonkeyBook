@@ -1,51 +1,59 @@
+{% extends "layout.html" %}
+
 {% block content %}
+    <div id="monkey_details">
+        <h1>{{ monkey.first_name }} {{ monkey.last_name }}</h1>
+        <p>{{ monkey.email }}</p>
+        {% if monkey.age() and monkey.age() == 1 %}
+            <p>{{ monkey.age() }} year old</p>
+        {% elif monkey.age() and monkey.age() > 1 %}
+            <p>{{ monkey.age() }} years old</p>
+        {% endif %}
+        {% if monkey.id == session['id'] %}
+            <a href="{{ url_for('edit') }}">Edit profile</a>
+        {% endif %}
+    </div>
 
-<div id="welcome">
-    Welcome, {{ monkey.first_name }} {{ monkey.last_name }}!
-    <a id="logout_link" href="/logout">Log out</a>
-</div>
-
-{% if monkey.best_friend %}
-<div id="best_friend">
-    Your best friend is {{ monkey.best_friend.first_name }} {{ monkey.best_friend.last_name }}
-</div>
-{% endif %}
-
-{% if mutual_friends %}
-<div id="mutual_friends">
-    <p>Mutual friends:</p>
-    <ul>
-        {% for friend in mutual_friends|sort(attribute='first_name') %}
-            <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
-
-{% if other_friends %}
-<div id="other_friends">
-    {% if mutual_friends %}
-        <p>Other friends:</p>
-    {% else %}
-        <p>Your friends:</p>
+    {% if monkey.best_friend %}
+        <div id="best_friend">
+            Your best friend is {{ monkey.best_friend.first_name }} {{ monkey.best_friend.last_name }}
+        </div>
     {% endif %}
-    <ul>
-        {% for friend in other_friends|sort(attribute='first_name') %}
-            <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
 
-{% if also_friend_of %}
-<div id="also_friend_of">
-    <p>Also friend of:</p>
-    <ul>
-        {% for friend in also_friend_of|sort(attribute='first_name') %}
-            <li>{{ friend.first_name }} {{ friend.last_name }}{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
+    {% if mutual_friends %}
+        <div id="mutual_friends" class="friend_list">
+            <p>Mutual friends:</p>
+            <ul>
+                {% for friend in mutual_friends|sort(attribute='first_name') %}
+                    <li><a href="{{ url_for('profile', monkey_id=friend.id) }}">{{ friend.first_name }} {{ friend.last_name }}</a>{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 
+    {% if other_friends %}
+        <div id="other_friends" class="friend_list">
+            {% if mutual_friends %}
+                <p>Other friends:</p>
+            {% else %}
+                <p>Your friends:</p>
+            {% endif %}
+            <ul>
+                {% for friend in other_friends|sort(attribute='first_name') %}
+                    <li><a href="{{ url_for('profile', monkey_id=friend.id) }}">{{ friend.first_name }} {{ friend.last_name }}</a>{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if also_friend_of %}
+        <div id="also_friend_of" class="friend_list">
+            <p>Also friend of:</p>
+            <ul>
+                {% for friend in also_friend_of|sort(attribute='first_name') %}
+                    <li><a href="{{ url_for('profile', monkey_id=friend.id) }}">{{ friend.first_name }} {{ friend.last_name }}</a>{% if friend.age() %}, {{ friend.age() }}{% endif %}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 {% endblock %}

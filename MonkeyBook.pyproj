@@ -51,6 +51,9 @@
   <ItemGroup>
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
+    <Content Include="MonkeyBook\templates\layout.html" />
+    <Content Include="MonkeyBook\templates\edit.html" />
+    <Content Include="MonkeyBook\templates\index.html" />
     <Content Include="MonkeyBook\templates\profile.html" />
     <Content Include="MonkeyBook\templates\login.html" />
     <Content Include="requirements.txt" />

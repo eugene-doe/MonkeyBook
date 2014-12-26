@@ -39,7 +39,11 @@ class Monkey(db.Model):
         # date_of_birth is a string before commit and a date object afterwards, therefore:
         if self.date_of_birth:
             if type(self.date_of_birth) is str:
-                bdate = parser.parse(self.date_of_birth).date()
+                try:
+                    bdate = parser.parse(self.date_of_birth).date()
+                except Exception:
+                    # If age() is called on an unbound monkey with incorrect date of birth, no age is returned:
+                    return None
             else:
                 bdate = self.date_of_birth
             today = date.today()
