@@ -273,14 +273,30 @@ def list(order=None):
 
     monkeys = Monkey.query.all()
 
+    # Sorting is done by tuples, so that first name, last name and number of friends are taken into account
+    # in all sorting modes (but in different order).
+    
+    # (monkey.best_friend is None) evaluates to True when a monkey has no best friend specified. This makes
+    # sure that the monkeys with best friends are listed first (since False < True).
+
+    # (monkey.best_friend.first_name.lower() if monkey.best_friend else '') substitutes an empty string and
+    # does not try to access a non-existent property when a monkey has no best friend.
+    
     if order == 'best_friend':
         monkeys = sorted(monkeys,
                          key=lambda monkey: (monkey.best_friend is None,
-                                             monkey.best_friend.first_name.lower() if monkey.best_friend else ''))
+                                             monkey.best_friend.first_name.lower() if monkey.best_friend else '',
+                                             monkey.first_name.lower(),
+                                             monkey.last_name.lower(),
+                                             -len(monkey.friends)))
     elif order == 'friends':
-        monkeys = sorted(monkeys, key=lambda monkey: -len(monkey.friends))
+        monkeys = sorted(monkeys, key=lambda monkey: (-len(monkey.friends),
+                                                      monkey.first_name.lower(),
+                                                      monkey.last_name.lower()))
     else:
-        monkeys = sorted(monkeys, key=lambda monkey: monkey.first_name.lower())
+        monkeys = sorted(monkeys, key=lambda monkey: (monkey.first_name.lower(),
+                                                      monkey.last_name.lower(),
+                                                      -len(monkey.friends)))
     
     return render_template('list.html', monkeys=monkeys, monkey_self=monkey_self)
 
