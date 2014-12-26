@@ -14,6 +14,9 @@ import os
 ## other monkey (such as a monkey that has not yet logged in or a monkey whose profile we
 ## are viewing) as 'monkey'.
 
+## All views that expect the user to be logged in should pass monkey_self to the template,
+## because monkey_self is used in layout.html.
+
 def login_required(f):
     """Redirect to login page if not logged in."""
     @wraps(f)
@@ -92,15 +95,15 @@ def register():
         else:
             form.email.errors.append('This e-mail address is registered with another user')
 
-    return render_template('edit.html',
-                           form=form,
-                           monkey_self=monkey_self)
+    return render_template('edit.html', form=form, monkey_self=monkey_self)
 
 @app.route('/delete')
 @app.route('/delete/<confirmed>')
 @login_required
 def delete(confirmed=None):
     """Delete monkey's profile."""
+    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+
     if confirmed == 'confirmed':
         monkey_self = Monkey.query.filter_by(id = session['id']).first()
         db.session.delete(monkey_self)
@@ -111,7 +114,7 @@ def delete(confirmed=None):
             db.session.close()
         return redirect(url_for('index'))
     else:
-        return render_template('delete.html')
+        return render_template('delete.html', monkey_self=monkey_self)
 
 @app.route('/')
 def index():
@@ -260,6 +263,26 @@ def clear_best():
         db.session.close()
 
     return redirect(request.referrer or url_for('index'))
+
+@app.route('/list')
+@app.route('/list/<order>')
+@login_required
+def list(order=None):
+    """List all monkeys."""
+    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+
+    monkeys = Monkey.query.all()
+
+    if order == 'best_friend':
+        monkeys = sorted(monkeys,
+                         key=lambda monkey: (monkey.best_friend is None,
+                                             monkey.best_friend.first_name.lower() if monkey.best_friend else ''))
+    elif order == 'friends':
+        monkeys = sorted(monkeys, key=lambda monkey: -len(monkey.friends))
+    else:
+        monkeys = sorted(monkeys, key=lambda monkey: monkey.first_name.lower())
+    
+    return render_template('list.html', monkeys=monkeys, monkey_self=monkey_self)
 
 # Randomly generated secret key
 app.secret_key = os.urandom(24)

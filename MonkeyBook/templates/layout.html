@@ -2,6 +2,7 @@
     <h2><a href="{{ url_for('index') }}">MonkeyBook</a></h2>
     {% if monkey_self %}
         <p>Logged in as <a href="{{ url_for('profile', monkey_id=monkey_self.id) }}">{{ monkey_self.first_name }} {{ monkey_self.last_name }}</a>
+        | <a href="{{ url_for('list') }}">Find friends</a>
         | <a href="{{ url_for('edit') }}">Edit profile</a>
         | <a id="logout_link" href="{{ url_for('logout') }}">Log out</a></p>
     {% endif %}
