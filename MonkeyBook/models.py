@@ -20,13 +20,13 @@ class Monkey(db.Model):
     date_of_birth = db.Column(db.Date)
 
     best_friend_id = db.Column(db.Integer, db.ForeignKey('monkey.id', ondelete='SET NULL'))
-    best_friend = db.relationship('Monkey', uselist=False, remote_side=[id], post_update=True)
+    best_friend = db.relationship('Monkey', uselist=False, remote_side=[id], post_update=True, lazy='joined')
 
     friends = db.relationship('Monkey',
                         secondary=friendship,
                         primaryjoin=id == friendship.c.left_monkey_id,
                         secondaryjoin=id == friendship.c.right_monkey_id,
-                        backref='friend_of') # backref=db.backref('friendOf', lazy='dynamic') for large collections
+                        backref=db.backref('friend_of', lazy='dynamic'))
     
     def __init__(self, first_name, last_name, password, email, date_of_birth=None):
         self.first_name = first_name

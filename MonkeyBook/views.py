@@ -1,10 +1,11 @@
 from flask import Flask, session, redirect, url_for, escape, request, render_template
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, desc
+from sqlalchemy.orm import aliased
 from functools import wraps
 from datetime import date
 from dateutil import parser
 from MonkeyBook import app
-from MonkeyBook.models import Monkey
+from MonkeyBook.models import Monkey, friendship
 from MonkeyBook.forms import *
 from MonkeyBook.models import db
 import os
@@ -271,32 +272,38 @@ def list(order=None):
     """List all monkeys."""
     monkey_self = Monkey.query.filter_by(id = session['id']).first()
 
-    monkeys = Monkey.query.all()
-
     # Sorting is done by tuples, so that first name, last name and number of friends are taken into account
     # in all sorting modes (but in different order).
     
-    # (monkey.best_friend is None) evaluates to True when a monkey has no best friend specified. This makes
-    # sure that the monkeys with best friends are listed first (since False < True).
+    # friend_count==0 evaluates to True when a monkey has no best friend specified. This makes sure that
+    # the monkeys with best friends are listed first (since False < True).
 
-    # (monkey.best_friend.first_name.lower() if monkey.best_friend else '') substitutes an empty string and
-    # does not try to access a non-existent property when a monkey has no best friend.
+    subquery = db.session.query(friendship.c.left_monkey_id, func.count('*').\
+        label('friend_count')).group_by(friendship.c.left_monkey_id).subquery()
+
+    m_alias = aliased(Monkey)
     
     if order == 'best_friend':
-        monkeys = sorted(monkeys,
-                         key=lambda monkey: (monkey.best_friend is None,
-                                             monkey.best_friend.first_name.lower() if monkey.best_friend else '',
-                                             monkey.first_name.lower(),
-                                             monkey.last_name.lower(),
-                                             -len(monkey.friends)))
+        monkeys = Monkey.query.outerjoin(subquery, Monkey.id==subquery.c.left_monkey_id).\
+            outerjoin(m_alias, m_alias.id==Monkey.best_friend_id).\
+            order_by(func.lower(m_alias.first_name),
+                     func.lower(m_alias.last_name),
+                     func.lower(Monkey.first_name),
+                     func.lower(Monkey.last_name),
+                     subquery.c.friend_count==0,
+                     subquery.c.friend_count.desc()).all()
     elif order == 'friends':
-        monkeys = sorted(monkeys, key=lambda monkey: (-len(monkey.friends),
-                                                      monkey.first_name.lower(),
-                                                      monkey.last_name.lower()))
+        monkeys = Monkey.query.outerjoin(subquery, Monkey.id==subquery.c.left_monkey_id).\
+            order_by(subquery.c.friend_count==0,
+                     subquery.c.friend_count.desc(),
+                     func.lower(Monkey.first_name),
+                     func.lower(Monkey.last_name)).all()
     else:
-        monkeys = sorted(monkeys, key=lambda monkey: (monkey.first_name.lower(),
-                                                      monkey.last_name.lower(),
-                                                      -len(monkey.friends)))
+        monkeys = Monkey.query.outerjoin(subquery, Monkey.id==subquery.c.left_monkey_id).\
+            order_by(func.lower(Monkey.first_name),
+                     func.lower(Monkey.last_name),
+                     subquery.c.friend_count==0,
+                     subquery.c.friend_count.desc()).all()
     
     return render_template('list.html', monkeys=monkeys, monkey_self=monkey_self)
 
