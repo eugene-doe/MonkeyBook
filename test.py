@@ -20,19 +20,7 @@ jack.friends.append(john)
 john.friends.append(jack)
 john.friends.append(jill)
 
-db.session.flush()
-
 jack.best_friend = jill
 john.best_friend = jack
 
 db.session.commit()
-
-# WTF?!
-#
-# >>> jack.friends
-# [Jill Jones, John Doe (33)]
-# >>> db.session.commit()
-# >>> jack.friends
-# [John Doe (33)]
-#
-# Doesn't happen with flushing, but the reason is still unknown.

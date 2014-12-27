@@ -20,7 +20,7 @@ class Monkey(db.Model):
     date_of_birth = db.Column(db.Date)
 
     best_friend_id = db.Column(db.Integer, db.ForeignKey('monkey.id', ondelete='SET NULL'))
-    best_friend = db.relationship('Monkey', uselist=False, remote_side=[id])
+    best_friend = db.relationship('Monkey', uselist=False, remote_side=[id], post_update=True)
 
     friends = db.relationship('Monkey',
                         secondary=friendship,

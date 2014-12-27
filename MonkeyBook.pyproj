@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="MonkeyBook\forms.py" />
+    <Compile Include="test_more.py" />
     <Compile Include="test.py" />
     <Compile Include="MonkeyBook\models.py">
       <SubType>Code</SubType>
