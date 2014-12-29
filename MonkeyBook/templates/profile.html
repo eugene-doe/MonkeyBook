@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% import "macros.html" as macros %}
 
 {% block content %}
     <div id="monkey_details">
@@ -63,7 +64,7 @@
     {% if mutual_friends %}
         <div id="mutual_friends" class="friend_list">
             <p>Mutual friends:</p>
-            {{ render_friends(mutual_friends) }}
+            {{ macros.render_monkeys(mutual_friends) }}
         </div>
     {% endif %}
 
@@ -74,30 +75,14 @@
             {% else %}
                 <p>Friends:</p>
             {% endif %}
-            {{ render_friends(other_friends) }}
+            {{ macros.render_monkeys(other_friends) }}
         </div>
     {% endif %}
 
     {% if also_friend_of %}
         <div id="also_friend_of" class="friend_list">
             <p>Also friend of:</p>
-            {{ render_friends(also_friend_of) }}
+            {{ macros.render_monkeys(also_friend_of) }}
         </div>
     {% endif %}
 {% endblock %}
-
-{% macro render_friends(friend_list) %}
-    <ul>
-        {%- for friend in friend_list %}
-            <li>
-                <a href="{{ url_for('profile', monkey_id=friend.id) }}">{{ friend.first_name }} {{ friend.last_name }}</a>
-                {%- if friend.age() %}, {{ friend.age() }}{% endif %}
-                <br>
-                Friends: {{ friend.friends|length }}
-                {% if friend.best_friend %}
-                    | Best friend: <a href="{{ url_for('profile', monkey_id=friend.best_friend.id) }}">{{ friend.best_friend.first_name }} {{ friend.best_friend.last_name }}</a>
-                {% endif %}
-            </li>
-        {%- endfor %}
-    </ul>
-{% endmacro %}

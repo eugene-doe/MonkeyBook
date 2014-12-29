@@ -57,6 +57,7 @@
     <Content Include="MonkeyBook\templates\edit.html" />
     <Content Include="MonkeyBook\templates\index.html" />
     <Content Include="MonkeyBook\templates\list.html" />
+    <Content Include="MonkeyBook\templates\macros.html" />
     <Content Include="MonkeyBook\templates\profile.html" />
     <Content Include="MonkeyBook\templates\login.html" />
     <Content Include="requirements.txt" />

@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% import "macros.html" as macros %}
 
 {% block content %}
     <div id="monkey_list">
@@ -8,17 +9,8 @@
             <a href="{{ url_for('list', order='best_friend') }}">by best friend</a> |
             <a href="{{ url_for('list', order='friends') }}">by number of friends</a>
         </p>
-        <ul>
-            {% for monkey in monkeys.items %}
-                <li>
-                    <a href="{{ url_for('profile', monkey_id=monkey.id) }}">{{ monkey.first_name }} {{ monkey.last_name }}</a>{% if monkey.age() %}, {{ monkey.age() }}{% endif %}<br>
-                    Friends: {{ monkey.friends|length }}
-                    {% if monkey.best_friend %}
-                        | Best friend: <a href="{{ url_for('profile', monkey_id=monkey.best_friend.id) }}">{{ monkey.best_friend.first_name }} {{ monkey.best_friend.last_name }}</a>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+
+        {{ macros.render_monkeys(monkeys.items) }}
 
         <p class="pagination">
             {% if monkeys.has_prev %}

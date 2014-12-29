@@ -1,0 +1,15 @@
+{% macro render_monkeys(friend_list) %}
+    <ul>
+        {%- for friend in friend_list %}
+            <li>
+                <a href="{{ url_for('profile', monkey_id=friend.id) }}">{{ friend.first_name }} {{ friend.last_name }}</a>
+                {%- if friend.age() %}, {{ friend.age() }}{% endif %}
+                <br>
+                Friends: {{ friend.friends|length }}
+                {% if friend.best_friend %}
+                    | Best friend: <a href="{{ url_for('profile', monkey_id=friend.best_friend.id) }}">{{ friend.best_friend.first_name }} {{ friend.best_friend.last_name }}</a>
+                {% endif %}
+            </li>
+        {%- endfor %}
+    </ul>
+{% endmacro %}
