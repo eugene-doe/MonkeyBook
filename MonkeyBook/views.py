@@ -142,8 +142,18 @@ def profile(monkey_id):
 
     if monkey:
         mutual_friends = set(monkey.friends).intersection(monkey.friend_of)
-        other_friends = set(monkey.friends).difference(monkey.friend_of)
+        other_friends  = set(monkey.friends).difference(monkey.friend_of)
         also_friend_of = set(monkey.friend_of).difference(monkey.friends)
+
+        # Populating the lists and sorting them could be done in one step,
+        # but I find this a lot more readable:
+
+        sort_order = lambda monkey: (monkey.first_name.lower(), monkey.last_name.lower(), -len(monkey.friends))
+
+        mutual_friends = sorted(mutual_friends, key=sort_order)
+        other_friends  = sorted(other_friends, key=sort_order)
+        also_friend_of = sorted(also_friend_of, key=sort_order)
+
     else:
         return redirect(url_for('index'))
 

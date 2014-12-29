@@ -20,16 +20,25 @@
             {% endfor %}
         </ul>
 
-        <p>
+        <p class="pagination">
             {% if monkeys.has_prev %}
                 <a href="{{ url_for('list', order=order, page=monkeys.prev_num) }}"><< Previous page</a>
-            {% else %}
-                << Previous page
-            {% endif %} |
+            {% endif %}
+
+            {% for page in monkeys.iter_pages() %}
+                {% if page %}
+                    {% if page != monkeys.page %}
+                        <a href="{{ url_for('list', order=order, page=page) }}">{{ page }}</a>
+                    {% else %}
+                        <strong>{{ page }}</strong>
+                    {% endif %}
+                {% else %}
+                    <span class=ellipsis>&#8230;</span>
+                {% endif %}
+            {% endfor %}
+
             {% if monkeys.has_next %}
                 <a href="{{ url_for('list', order=order, page=monkeys.next_num) }}">Next page >></a>
-            {% else %}
-                Next page >>
             {% endif %}
         </p>
     </div>
