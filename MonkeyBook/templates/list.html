@@ -9,7 +9,7 @@
             <a href="{{ url_for('list', order='friends') }}">by number of friends</a>
         </p>
         <ul>
-            {% for monkey in monkeys %}
+            {% for monkey in monkeys.items %}
                 <li>
                     <a href="{{ url_for('profile', monkey_id=monkey.id) }}">{{ monkey.first_name }} {{ monkey.last_name }}</a>{% if monkey.age() %}, {{ monkey.age() }}{% endif %}<br>
                     Friends: {{ monkey.friends|length }}
@@ -19,5 +19,18 @@
                 </li>
             {% endfor %}
         </ul>
+
+        <p>
+            {% if monkeys.has_prev %}
+                <a href="{{ url_for('list', order=order, page=monkeys.prev_num) }}"><< Previous page</a>
+            {% else %}
+                << Previous page
+            {% endif %} |
+            {% if monkeys.has_next %}
+                <a href="{{ url_for('list', order=order, page=monkeys.next_num) }}">Next page >></a>
+            {% else %}
+                Next page >>
+            {% endif %}
+        </p>
     </div>
 {% endblock %}

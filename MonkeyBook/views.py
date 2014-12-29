@@ -103,10 +103,9 @@ def register():
 @login_required
 def delete(confirmed=None):
     """Delete monkey's profile."""
-    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+    monkey_self = Monkey.query.get(session['id'])
 
     if confirmed == 'confirmed':
-        monkey_self = Monkey.query.filter_by(id = session['id']).first()
         db.session.delete(monkey_self)
         try:
             db.session.commit()
@@ -122,21 +121,21 @@ def index():
     """Display the index page, logged in or not."""
     monkey_self = None
     if 'id' in session:
-        monkey_self = Monkey.query.filter_by(id = session['id']).first()
+        monkey_self = Monkey.query.get(session['id'])
     return render_template('index.html', monkey_self=monkey_self)
 
 @app.route('/<int:monkey_id>')
 @login_required
 def profile(monkey_id):
     """Display a monkey's profile, own or not."""
-    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+    monkey_self = Monkey.query.get(session['id'])
 
     if monkey_id == session['id']:
         # Viewing your own profile
         monkey = monkey_self
     else:
         # Viewing somebody else's profile
-        monkey = Monkey.query.filter_by(id = monkey_id).first()
+        monkey = Monkey.query.get(monkey_id)
 
     # The following lists keep logic out of the templates
     # and keep the model simple at the same time:
@@ -159,7 +158,7 @@ def profile(monkey_id):
 @login_required
 def edit():
     """Edit monkey's own profile."""
-    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+    monkey_self = Monkey.query.get(session['id'])
 
     # If no formdata is present in the request, the form is populated from the object:
     form = ProfileEditForm(request.form, monkey_self)
@@ -202,8 +201,8 @@ def edit():
 @login_required
 def add(monkey_id):
     """Add a monkey to friends."""
-    monkey_self = Monkey.query.filter_by(id = session['id']).first()
-    monkey = Monkey.query.filter_by(id = monkey_id).first()
+    monkey_self = Monkey.query.get(session['id'])
+    monkey = Monkey.query.get(monkey_id)
 
     # If monkey exists, is not you and is not your friend already:
     if monkey and monkey is not monkey_self and monkey not in monkey_self.friends:
@@ -219,8 +218,8 @@ def add(monkey_id):
 @login_required
 def remove(monkey_id):
     """Remove a monkey from friends."""
-    monkey_self = Monkey.query.filter_by(id = session['id']).first()
-    monkey = Monkey.query.filter_by(id = monkey_id).first()
+    monkey_self = Monkey.query.get(session['id'])
+    monkey = Monkey.query.get(monkey_id)
 
     # Only a friend can be the best friend:
     if monkey is monkey_self.best_friend:
@@ -239,8 +238,8 @@ def remove(monkey_id):
 @login_required
 def best(monkey_id):
     """Make a monkey your best friend."""
-    monkey_self = Monkey.query.filter_by(id = session['id']).first()
-    monkey = Monkey.query.filter_by(id = monkey_id).first()
+    monkey_self = Monkey.query.get(session['id'])
+    monkey = Monkey.query.get(monkey_id)
 
     if monkey is not monkey_self:
         monkey_self.best_friend = monkey
@@ -255,7 +254,7 @@ def best(monkey_id):
 @login_required
 def clear_best():
     """Clear your best friend."""
-    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+    monkey_self = Monkey.query.get(session['id'])
 
     monkey_self.best_friend = None
     try:
@@ -266,11 +265,13 @@ def clear_best():
     return redirect(request.referrer or url_for('index'))
 
 @app.route('/list')
+@app.route('/list/<int:page>')
 @app.route('/list/<order>')
+@app.route('/list/<order>/<int:page>')
 @login_required
-def list(order=None):
+def list(order=None, page=1):
     """List all monkeys."""
-    monkey_self = Monkey.query.filter_by(id = session['id']).first()
+    monkey_self = Monkey.query.get(session['id'])
 
     # Sorting is done by tuples, so that first name, last name and number of friends are taken into account
     # in all sorting modes (but in different order).
@@ -282,6 +283,8 @@ def list(order=None):
         label('friend_count')).group_by(friendship.c.left_monkey_id).subquery()
 
     m_alias = aliased(Monkey)
+
+    monkeys_per_page = 10
     
     if order == 'best_friend':
         monkeys = Monkey.query.outerjoin(subquery, Monkey.id==subquery.c.left_monkey_id).\
@@ -291,21 +294,21 @@ def list(order=None):
                      func.lower(Monkey.first_name),
                      func.lower(Monkey.last_name),
                      subquery.c.friend_count==0,
-                     subquery.c.friend_count.desc()).all()
+                     subquery.c.friend_count.desc()).paginate(page, monkeys_per_page)
     elif order == 'friends':
         monkeys = Monkey.query.outerjoin(subquery, Monkey.id==subquery.c.left_monkey_id).\
             order_by(subquery.c.friend_count==0,
                      subquery.c.friend_count.desc(),
                      func.lower(Monkey.first_name),
-                     func.lower(Monkey.last_name)).all()
+                     func.lower(Monkey.last_name)).paginate(page, monkeys_per_page)
     else:
         monkeys = Monkey.query.outerjoin(subquery, Monkey.id==subquery.c.left_monkey_id).\
             order_by(func.lower(Monkey.first_name),
                      func.lower(Monkey.last_name),
                      subquery.c.friend_count==0,
-                     subquery.c.friend_count.desc()).all()
+                     subquery.c.friend_count.desc()).paginate(page, monkeys_per_page)
     
-    return render_template('list.html', monkeys=monkeys, monkey_self=monkey_self)
+    return render_template('list.html', monkeys=monkeys, monkey_self=monkey_self, order=order)
 
 # Randomly generated secret key
 app.secret_key = os.urandom(24)
