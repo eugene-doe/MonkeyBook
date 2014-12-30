@@ -91,7 +91,7 @@ def register():
                 session['id'] = monkey_self.id
                 return redirect(url_for('index'))
             except Exception:
-                db.session.close()
+                db.session.rollback()
         else:
             form.email.errors.append('This e-mail address is registered with another user')
 
@@ -110,7 +110,7 @@ def delete(confirmed=None):
             db.session.commit()
             session.pop('id', None)
         except Exception:
-            db.session.close()
+            db.session.rollback()
         return redirect(url_for('index'))
     else:
         return render_template('delete.html', monkey_self=monkey_self)
@@ -194,7 +194,7 @@ def edit():
                 edit_result = 'Changed saved'
                 edit_result_class = 'message_ok'
             except Exception:
-                db.session.close()
+                db.session.rollback()
                 edit_result = 'Error saving changes'
                 edit_result_class = 'message_error'
         else:
@@ -219,7 +219,7 @@ def add(monkey_id):
         try:
             db.session.commit()
         except Exception:
-            db.session.close()
+            db.session.rollback()
 
     return redirect(request.referrer or url_for('index'))
 
@@ -239,7 +239,7 @@ def remove(monkey_id):
         try:
             db.session.commit()
         except Exception:
-            db.session.close()
+            db.session.rollback()
 
     return redirect(request.referrer or url_for('index'))
 
@@ -255,7 +255,7 @@ def best(monkey_id):
         try:
             db.session.commit()
         except Exception:
-            db.session.close()
+            db.session.rollback()
 
     return redirect(request.referrer or url_for('index'))
 
@@ -269,7 +269,7 @@ def clear_best():
     try:
         db.session.commit()
     except Exception:
-        db.session.close()
+        db.session.rollback()
 
     return redirect(request.referrer or url_for('index'))
 
