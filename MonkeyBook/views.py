@@ -5,9 +5,8 @@ from functools import wraps
 from datetime import date
 from dateutil import parser
 from MonkeyBook import app
-from MonkeyBook.models import Monkey, friendship
+from MonkeyBook.models import Monkey, friendship, db
 from MonkeyBook.forms import *
-from MonkeyBook.models import db
 import os
 
 ## Some views may require two monkey objects: the logged in monkey and some other monkey.
@@ -151,7 +150,7 @@ def profile(monkey_id):
         sort_order = lambda monkey: (monkey.first_name.lower(), monkey.last_name.lower(), -len(monkey.friends))
 
         mutual_friends = sorted(mutual_friends, key=sort_order)
-        other_friends  = sorted(other_friends, key=sort_order)
+        other_friends  = sorted(other_friends,  key=sort_order)
         also_friend_of = sorted(also_friend_of, key=sort_order)
 
     else:

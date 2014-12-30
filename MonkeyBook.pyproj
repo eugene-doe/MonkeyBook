@@ -32,26 +32,44 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="MonkeyBook\forms.py" />
-    <Compile Include="test_more.py" />
-    <Compile Include="test.py" />
+    <Compile Include="testdata\additional.py" />
+    <Compile Include="testdata\initial.py" />
     <Compile Include="MonkeyBook\models.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="runserver.py" />
     <Compile Include="MonkeyBook\__init__.py" />
     <Compile Include="MonkeyBook\views.py" />
+    <Compile Include="tests\test_app.py" />
+    <Compile Include="tests\conftest.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MonkeyBook\" />
+    <Folder Include="MonkeyBook\static\css\" />
+    <Folder Include="MonkeyBook\static\img\" />
+    <Folder Include="MonkeyBook\static\js\" />
+    <Folder Include="testdata\" />
     <Folder Include="MonkeyBook\static\" />
-    <Folder Include="MonkeyBook\static\content\" />
-    <Folder Include="MonkeyBook\static\fonts\" />
-    <Folder Include="MonkeyBook\static\scripts\" />
     <Folder Include="MonkeyBook\templates\" />
+    <Folder Include="tests\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
+    <Content Include="MonkeyBook\static\css\bootstrap-responsive.css" />
+    <Content Include="MonkeyBook\static\css\bootstrap-responsive.min.css" />
+    <Content Include="MonkeyBook\static\css\bootstrap.css" />
+    <Content Include="MonkeyBook\static\css\bootstrap.min.css" />
+    <Content Include="MonkeyBook\static\img\glyphicons-halflings-white.png" />
+    <Content Include="MonkeyBook\static\img\glyphicons-halflings.png" />
+    <Content Include="MonkeyBook\static\js\bootstrap.js" />
+    <Content Include="MonkeyBook\static\js\bootstrap.min.js" />
+    <Content Include="MonkeyBook\static\js\jquery-1.11.2.js" />
+    <Content Include="MonkeyBook\static\js\jquery-1.11.2.min.js" />
+    <Content Include="MonkeyBook\static\js\jquery-1.11.2.min.map" />
     <Content Include="MonkeyBook\templates\delete.html" />
     <Content Include="MonkeyBook\templates\layout.html" />
     <Content Include="MonkeyBook\templates\edit.html" />
@@ -61,28 +79,6 @@
     <Content Include="MonkeyBook\templates\profile.html" />
     <Content Include="MonkeyBook\templates\login.html" />
     <Content Include="requirements.txt" />
-    <Content Include="MonkeyBook\static\content\bootstrap.css" />
-    <Content Include="MonkeyBook\static\content\bootstrap.min.css" />
-    <Content Include="MonkeyBook\static\content\site.css" />
-    <Content Include="MonkeyBook\static\fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="MonkeyBook\static\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="MonkeyBook\static\fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="MonkeyBook\static\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="MonkeyBook\static\scripts\bootstrap.js" />
-    <Content Include="MonkeyBook\static\scripts\bootstrap.min.js" />
-    <Content Include="MonkeyBook\static\scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="MonkeyBook\static\scripts\jquery-1.10.2.js" />
-    <Content Include="MonkeyBook\static\scripts\jquery-1.10.2.min.js" />
-    <Content Include="MonkeyBook\static\scripts\jquery-1.10.2.min.map" />
-    <Content Include="MonkeyBook\static\scripts\jquery.validate-vsdoc.js" />
-    <Content Include="MonkeyBook\static\scripts\jquery.validate.js" />
-    <Content Include="MonkeyBook\static\scripts\jquery.validate.min.js" />
-    <Content Include="MonkeyBook\static\scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="MonkeyBook\static\scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="MonkeyBook\static\scripts\modernizr-2.6.2.js" />
-    <Content Include="MonkeyBook\static\scripts\respond.js" />
-    <Content Include="MonkeyBook\static\scripts\respond.min.js" />
-    <Content Include="MonkeyBook\static\scripts\_references.js" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="..\venv\">

@@ -1,4 +1,4 @@
-# >>> exec(open("test.py").read())
+# >>> exec(open("testdata/initial.py").read())
 
 from MonkeyBook.models import db
 from MonkeyBook.models import Monkey
