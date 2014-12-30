@@ -19,11 +19,10 @@
             </ul>
          {% endif %}
 
-        <p>
-            <input type="submit" value="Save">
-            {% if edit_result %}
-                <span id="edit_result" class="{{ edit_result_class }}">{{ edit_result }}</span>
-            {% endif %}
-        </p>
+        <p><input type="submit" value="Save"></p>
     </form>
+
+    {% if monkey_self %}
+        <a href="{{ url_for('delete') }}">Delete profile</a>
+    {% endif %}
 {% endblock %}

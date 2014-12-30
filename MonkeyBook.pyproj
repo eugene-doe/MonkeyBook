@@ -37,6 +37,7 @@
     <Compile Include="MonkeyBook\models.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MonkeyBook\dba.py" />
     <Compile Include="runserver.py" />
     <Compile Include="MonkeyBook\__init__.py" />
     <Compile Include="MonkeyBook\views.py" />

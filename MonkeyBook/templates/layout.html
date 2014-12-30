@@ -1,12 +1,34 @@
-<div id="header">
-    <h2><a href="{{ url_for('index') }}">MonkeyBook</a></h2>
-    {% if monkey_self %}
-        <p>Logged in as <a href="{{ url_for('profile', monkey_id=monkey_self.id) }}">{{ monkey_self.first_name }} {{ monkey_self.last_name }}</a>
-        | <a href="{{ url_for('list') }}">Find friends</a>
-        | <a href="{{ url_for('edit') }}">Edit profile</a>
-        | <a id="logout_link" href="{{ url_for('logout') }}">Log out</a></p>
-    {% endif %}
-</div>
+<!DOCTYPE html>
 
-{% block content %}{% endblock %}
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>MonkeyBook</title>
+</head>
+
+<body>
+    <div id="header">
+        <h2><a href="{{ url_for('index') }}">MonkeyBook</a></h2>
+        {% if monkey_self %}
+            <p>Logged in as <a href="{{ url_for('profile', monkey_id=monkey_self.id) }}">{{ monkey_self.first_name }} {{ monkey_self.last_name }}</a>
+            | <a href="{{ url_for('list') }}">Find friends</a>
+            | <a href="{{ url_for('edit') }}">Edit profile</a>
+            | <a id="logout_link" href="{{ url_for('logout') }}">Log out</a></p>
+        {% endif %}
+    </div>
+
+    <div id="flashes">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    {% block content %}{% endblock %}
+</body>
+
 {% block scripts %}{% endblock %}

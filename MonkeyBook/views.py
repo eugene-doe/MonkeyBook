@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect, url_for, escape, request, render_template
+from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
 from sqlalchemy import func, and_, desc
 from sqlalchemy.orm import aliased
 from functools import wraps
@@ -7,6 +7,7 @@ from dateutil import parser
 from MonkeyBook import app
 from MonkeyBook.models import Monkey, friendship, db
 from MonkeyBook.forms import *
+import MonkeyBook.dba as dba
 import os
 
 ## Some views may require two monkey objects: the logged in monkey and some other monkey.
@@ -34,10 +35,10 @@ def login():
 
     if request.method == 'POST' and form.validate():
         # Find a monkey with a matching email in the database:
-        monkey = Monkey.query.filter(func.lower(Monkey.email) == func.lower(request.form['email'])).first()
+        monkey = dba.get_monkey_by_email(form['email'].data)
 
         # If such monkey is found, compare the password:
-        if monkey is not None and monkey.password == request.form['password']:
+        if monkey is not None and monkey.password == form['password'].data:
             # If matches, log in:
             next = session.get('next')
             session.clear()
@@ -65,53 +66,40 @@ def register():
     if 'id' in session:
         return redirect(url_for('index'))
 
-    monkey_self = None
-
     form = ProfileEditForm(request.form)
 
     if request.method == 'POST' and form.validate():
         # Check for email uniqueness by querying for another monkey with the same address:
-        if not Monkey.query.filter(func.lower(Monkey.email) == func.lower(request.form['email'])).first():
-
-            # If no duplicate found, create the monkey object and commit:
-            monkey_self = Monkey(request.form['first_name'],
-                                 request.form['last_name'],
-                                 request.form['password'],
-                                 request.form['email'])
-
-            try:
-                if request.form['date_of_birth'] == '':
-                    # Handling empty birth dates:
-                    monkey_self.date_of_birth = None
-                else:
-                    # Handling different date formats:
-                    monkey_self.date_of_birth = parser.parse(request.form['date_of_birth']).date()
-                db.session.add(monkey_self)
-                db.session.commit()
-                session['id'] = monkey_self.id
+        if dba.check_unique_email(form['email'].data):
+            # If no duplicate found:
+            monkey = dba.register_monkey(form)
+            if (monkey):
+                # If registered, log in and go to index:
+                session['id'] = monkey.id
                 return redirect(url_for('index'))
-            except Exception:
-                db.session.rollback()
+            else:
+                flash('Error registering!')
         else:
             form.email.errors.append('This e-mail address is registered with another user')
 
-    return render_template('edit.html', form=form, monkey_self=monkey_self)
+    return render_template('edit.html', form=form)
 
 @app.route('/delete')
 @app.route('/delete/<confirmed>')
 @login_required
 def delete(confirmed=None):
     """Delete monkey's profile."""
-    monkey_self = Monkey.query.get(session['id'])
+    monkey_self = dba.get_monkey_by_id(session['id'])
 
     if confirmed == 'confirmed':
-        db.session.delete(monkey_self)
-        try:
-            db.session.commit()
+        if dba.delete_monkey(monkey_self):
+            # If deleted, log out:
             session.pop('id', None)
-        except Exception:
-            db.session.rollback()
-        return redirect(url_for('index'))
+            flash('Profile deleted')
+            return redirect(url_for('index'))
+        else:
+            flash('Error deleting profile!')
+            return redirect(url_for('edit'))
     else:
         return render_template('delete.html', monkey_self=monkey_self)
 
@@ -120,157 +108,101 @@ def index():
     """Display the index page, logged in or not."""
     monkey_self = None
     if 'id' in session:
-        monkey_self = Monkey.query.get(session['id'])
+        monkey_self = dba.get_monkey_by_id(session['id'])
     return render_template('index.html', monkey_self=monkey_self)
 
 @app.route('/<int:monkey_id>')
 @login_required
 def profile(monkey_id):
     """Display a monkey's profile, own or not."""
-    monkey_self = Monkey.query.get(session['id'])
+    monkey_self = dba.get_monkey_by_id(session['id'])
 
+    # This condition avoids running a second query when viewing own profile:
     if monkey_id == session['id']:
         # Viewing your own profile
         monkey = monkey_self
     else:
         # Viewing somebody else's profile
-        monkey = Monkey.query.get(monkey_id)
-
-    # The following lists keep logic out of the templates
-    # and keep the model simple at the same time:
+        monkey = dba.get_monkey_by_id(monkey_id)
 
     if monkey:
-        mutual_friends = set(monkey.friends).intersection(monkey.friend_of)
-        other_friends  = set(monkey.friends).difference(monkey.friend_of)
-        also_friend_of = set(monkey.friend_of).difference(monkey.friends)
-
-        # Populating the lists and sorting them could be done in one step,
-        # but I find this a lot more readable:
-
-        sort_order = lambda monkey: (monkey.first_name.lower(), monkey.last_name.lower(), -len(monkey.friends))
-
-        mutual_friends = sorted(mutual_friends, key=sort_order)
-        other_friends  = sorted(other_friends,  key=sort_order)
-        also_friend_of = sorted(also_friend_of, key=sort_order)
-
+        profile = dba.get_monkey_profile(monkey)
     else:
+        # Non-existent id in the URL
         return redirect(url_for('index'))
 
     return render_template('profile.html',
                             monkey=monkey,
                             monkey_self=monkey_self,
-                            mutual_friends=mutual_friends,
-                            other_friends=other_friends,
-                            also_friend_of=also_friend_of)
+                            mutual_friends=profile['mutual_friends'],
+                            other_friends=profile['other_friends'],
+                            also_friend_of=profile['also_friend_of'])
 
 @app.route('/edit', methods=['GET', 'POST'])
 @login_required
 def edit():
     """Edit monkey's own profile."""
-    monkey_self = Monkey.query.get(session['id'])
+    monkey_self = dba.get_monkey_by_id(session['id'])
 
     # If no formdata is present in the request, the form is populated from the object:
     form = ProfileEditForm(request.form, monkey_self)
 
-    # Used in the template:
-    edit_result = ''
-    edit_result_class = ''
-
     if request.method == 'POST' and form.validate():
         # Check for email uniqueness by querying for another monkey with the same address:
-        if not Monkey.query.filter(and_(func.lower(Monkey.email) == func.lower(request.form['email']),
-                                        Monkey.id != session['id'])).first():
-            # If no duplicate found, populate the monkey object and commit:
-            form.populate_obj(monkey_self)
-
-            try:
-                if monkey_self.date_of_birth == '':
-                    # Handling empty birth dates:
-                    monkey_self.date_of_birth = None
-                else:
-                    # Handling different date formats:
-                    monkey_self.date_of_birth = parser.parse(request.form['date_of_birth']).date()
-                db.session.commit()
-                edit_result = 'Changed saved'
-                edit_result_class = 'message_ok'
-            except Exception:
-                db.session.rollback()
-                edit_result = 'Error saving changes'
-                edit_result_class = 'message_error'
+        if dba.check_unique_email(form['email'].data, monkey_self.id):
+            # If no duplicate found:
+            if dba.edit_monkey_profile(monkey_self, form):
+                flash('Changes saves')
+            else:
+                flash('Error saving changes!')
         else:
             form.email.errors.append('This e-mail address is registered with another user')
 
-    return render_template('edit.html',
-                           form=form,
-                           monkey_self=monkey_self,
-                           edit_result=edit_result,
-                           edit_result_class=edit_result_class)
+    return render_template('edit.html', form=form, monkey_self=monkey_self)
 
 @app.route('/add/<int:monkey_id>')
 @login_required
 def add(monkey_id):
     """Add a monkey to friends."""
-    monkey_self = Monkey.query.get(session['id'])
-    monkey = Monkey.query.get(monkey_id)
-
-    # If monkey exists, is not you and is not your friend already:
-    if monkey and monkey is not monkey_self and monkey not in monkey_self.friends:
-        monkey_self.friends.append(monkey)
-        try:
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-
+    monkey_self = dba.get_monkey_by_id(session['id'])
+    monkey = dba.get_monkey_by_id(monkey_id)
+    if not dba.add_friend(monkey_self, monkey):
+        flash('Error adding friend!')
     return redirect(request.referrer or url_for('index'))
 
 @app.route('/remove/<int:monkey_id>')
 @login_required
 def remove(monkey_id):
     """Remove a monkey from friends."""
-    monkey_self = Monkey.query.get(session['id'])
-    monkey = Monkey.query.get(monkey_id)
+    monkey_self = dba.get_monkey_by_id(session['id'])
+    monkey = dba.get_monkey_by_id(monkey_id)
 
     # Only a friend can be the best friend:
     if monkey is monkey_self.best_friend:
-        monkey_self.best_friend = None
+        if not dba.clear_best_friend(monkey_self):
+            flash('Error clearing best friend!')
 
-    if monkey in monkey_self.friends:
-        monkey_self.friends.remove(monkey)
-        try:
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-
+    if not dba.remove_friend(monkey_self, monkey):
+        flash('Error removing friend!')
     return redirect(request.referrer or url_for('index'))
 
 @app.route('/best/<int:monkey_id>')
 @login_required
 def best(monkey_id):
     """Make a monkey your best friend."""
-    monkey_self = Monkey.query.get(session['id'])
-    monkey = Monkey.query.get(monkey_id)
-
-    if monkey is not monkey_self:
-        monkey_self.best_friend = monkey
-        try:
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-
+    monkey_self = dba.get_monkey_by_id(session['id'])
+    monkey = dba.get_monkey_by_id(monkey_id)
+    if not dba.set_best_friend(monkey_self, monkey):
+        flash('Error setting best friend!')
     return redirect(request.referrer or url_for('index'))
 
 @app.route('/clear_best')
 @login_required
 def clear_best():
     """Clear your best friend."""
-    monkey_self = Monkey.query.get(session['id'])
-
-    monkey_self.best_friend = None
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-
+    monkey_self = dba.get_monkey_by_id(session['id'])
+    if not dba.clear_best_friend(monkey_self):
+        flash('Error clearing best friend!')
     return redirect(request.referrer or url_for('index'))
 
 @app.route('/list')
@@ -280,43 +212,8 @@ def clear_best():
 @login_required
 def list(order=None, page=1):
     """List all monkeys."""
-    monkey_self = Monkey.query.get(session['id'])
-
-    # Sorting is done by tuples, so that first name, last name and number of friends are taken into account
-    # in all sorting modes (but in different order).
-    
-    # friend_count==0 evaluates to True when a monkey has no best friend specified. This makes sure that
-    # the monkeys with best friends are listed first (since False < True).
-
-    subquery = db.session.query(friendship.c.left_monkey_id, func.count('*').\
-        label('friend_count')).group_by(friendship.c.left_monkey_id).subquery()
-
-    m_alias = aliased(Monkey)
-
-    monkeys_per_page = 10
-    
-    if order == 'best_friend':
-        monkeys = Monkey.query.outerjoin(subquery, Monkey.id==subquery.c.left_monkey_id).\
-            outerjoin(m_alias, m_alias.id==Monkey.best_friend_id).\
-            order_by(func.lower(m_alias.first_name),
-                     func.lower(m_alias.last_name),
-                     func.lower(Monkey.first_name),
-                     func.lower(Monkey.last_name),
-                     subquery.c.friend_count==0,
-                     subquery.c.friend_count.desc()).paginate(page, monkeys_per_page)
-    elif order == 'friends':
-        monkeys = Monkey.query.outerjoin(subquery, Monkey.id==subquery.c.left_monkey_id).\
-            order_by(subquery.c.friend_count==0,
-                     subquery.c.friend_count.desc(),
-                     func.lower(Monkey.first_name),
-                     func.lower(Monkey.last_name)).paginate(page, monkeys_per_page)
-    else:
-        monkeys = Monkey.query.outerjoin(subquery, Monkey.id==subquery.c.left_monkey_id).\
-            order_by(func.lower(Monkey.first_name),
-                     func.lower(Monkey.last_name),
-                     subquery.c.friend_count==0,
-                     subquery.c.friend_count.desc()).paginate(page, monkeys_per_page)
-    
+    monkey_self = dba.get_monkey_by_id(session['id'])
+    monkeys = dba.list_monkeys(order, page)   
     return render_template('list.html', monkeys=monkeys, monkey_self=monkey_self, order=order)
 
 # Randomly generated secret key
