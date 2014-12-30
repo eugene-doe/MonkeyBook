@@ -32,8 +32,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="MonkeyBook\forms.py" />
-    <Compile Include="testdata\additional.py" />
-    <Compile Include="testdata\initial.py" />
+    <Compile Include="db_additional.py" />
+    <Compile Include="db_initial.py" />
     <Compile Include="MonkeyBook\models.py">
       <SubType>Code</SubType>
     </Compile>
@@ -51,7 +51,6 @@
     <Folder Include="MonkeyBook\static\css\" />
     <Folder Include="MonkeyBook\static\img\" />
     <Folder Include="MonkeyBook\static\js\" />
-    <Folder Include="testdata\" />
     <Folder Include="MonkeyBook\static\" />
     <Folder Include="MonkeyBook\templates\" />
     <Folder Include="tests\" />
