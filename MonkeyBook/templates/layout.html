@@ -1,11 +1,13 @@
-<!DOCTYPE html>
+﻿{% extends "bootstrap/base.html" %}
 
-<head>
+{% block title %}MonkeyBook{% endblock %}
+
+{%- block metas %}
+    {{ super() }}
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>MonkeyBook</title>
-</head>
+{%- endblock metas %}
 
-<body>
+{% block navbar %}
     <div id="header">
         <h2><a href="{{ url_for('index') }}">MonkeyBook</a></h2>
         {% if monkey_self %}
@@ -27,8 +29,6 @@
             {% endif %}
         {% endwith %}
     </div>
+{%- endblock navbar %}
 
-    {% block content %}{% endblock %}
-</body>
-
-{% block scripts %}{% endblock %}
+{% block content %}{% endblock %}
