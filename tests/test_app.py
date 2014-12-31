@@ -5,7 +5,7 @@ from datetime import date
 import pytest, sqlalchemy_utils
 import MonkeyBook.dba as dba
 
-## This file requires database tables to be created, but does not require any data to be present.
+## This module requires database tables to be created, but does not require any data to be present.
 ## The database should not contain monkeys with the following emails, because they are created
 ## during the tests: test@email.com, billg@microsoft.com, rms@gnu.org
 
@@ -110,8 +110,7 @@ class TestClass:
         assert monkey.age() == None
 
         # Fails to rollback, cleanup:
-        db.session.delete(monkey)
-        db.session.commit()
+        dba.delete_monkey(monkey)
 
     def test_add_friend(session):
         bill = Monkey('Bill', 'Gates', 'secret', 'billg@microsoft.com')
