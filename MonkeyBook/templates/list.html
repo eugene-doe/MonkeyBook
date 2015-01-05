@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% import "macros.html" as macros %}
 
-{% block content %}
+{% block container %}
+    <h2>Friend Finder</h2>
     <div id="monkey_list">
         <p>
             All monkeys
@@ -14,23 +15,29 @@
 
         <p class="pagination">
             {% if monkeys.has_prev %}
-                <a href="{{ url_for('list', order=order, page=monkeys.prev_num) }}"><< Previous page</a>
+                <a href="{{ url_for('list', order=order, page=monkeys.prev_num) }}" class="btn btn-info btn-sm" role="button">
+                    &#9664; Previous page
+                </a>
             {% endif %}
 
             {% for page in monkeys.iter_pages() %}
                 {% if page %}
                     {% if page != monkeys.page %}
-                        <a href="{{ url_for('list', order=order, page=page) }}">{{ page }}</a>
+                        <a href="{{ url_for('list', order=order, page=page) }}" class="btn btn-default btn-sm" role="button">
+                            {{ page }}
+                        </a>
                     {% else %}
-                        <strong>{{ page }}</strong>
+                        <strong>&nbsp;{{ page }}&nbsp;</strong>
                     {% endif %}
                 {% else %}
-                    <span class=ellipsis>&#8230;</span>
+                    &#8230;
                 {% endif %}
             {% endfor %}
 
             {% if monkeys.has_next %}
-                <a href="{{ url_for('list', order=order, page=monkeys.next_num) }}">Next page >></a>
+                <a href="{{ url_for('list', order=order, page=monkeys.next_num) }}" class="btn btn-info btn-sm" role="button">
+                    Next page &#9654;
+                </a>
             {% endif %}
         </p>
     </div>

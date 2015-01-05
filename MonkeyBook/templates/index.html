@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 
-{% block content %}
+{% block container %}
     {% if monkey_self %}
         <h2>Welcome back!</h2>
         <p>Go to your <a href="{{ url_for('profile', monkey_id=monkey_self.id) }}">profile</a> to see your friends
             or check the list of <a href="{{ url_for('list') }}">all monkeys</a> to make new friends.</p>
     {% else %}
-        <h2>Welcome to MonkeyBook!</h2>
+        <h2>Welcome to Monkeybook!</h2>
         <p>Please <a href="{{ url_for('login') }}">log in</a>
             or <a href="{{ url_for('register') }}">register</a> to use the service.</p>
     {% endif %}

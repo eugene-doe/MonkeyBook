@@ -1,0 +1,25 @@
+﻿#header {
+    color: white;
+    margin-bottom: 0;
+}
+
+    #header a {
+        color: white;
+    }
+
+#site_heading {
+    font-weight: bold;
+}
+
+    #site_heading a {
+        text-decoration: none;
+    }
+
+#flashes {
+    padding-top: 10px;
+    min-height: 0;
+}
+
+.friend_tile {
+    padding: 10px;
+}

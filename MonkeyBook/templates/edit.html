@@ -1,28 +1,77 @@
 {% extends "layout.html" %}
 
-{% block content %}
-    <form method="post">
-        <p>{{ form.first_name.label }}: {{ form.first_name() }}</p>
-        <p>{{ form.last_name.label }}: {{ form.last_name() }}</p>
-        <p>{{ form.email.label }}: {{ form.email() }}</p>
-        <p>{{ form.date_of_birth.label }}: {{ form.date_of_birth() }}</p>
-        <p>{{ form.password.label }}: {{ form.password() }}</p>
-        <p>{{ form.confirm.label }}: {{ form.confirm() }}</p>
+{% block container %}
+    {% if request.endpoint == 'edit' %}
+        <h2>Edit your profile</h2>
+    {% elif request.endpoint == 'register' %}
+        <h2>Registration</h2>
+    {% endif %}
+
+    <!-- Forms could be done easier with Flask-WTF, but this is pure Bootstrap -->
+    
+    <form class="form-horizontal" method="post" role="form">
+        <div class="form-group">
+            {{ form.first_name.label(class_="col-sm-2 control-label") }}
+            <div class="col-sm-4">
+                {{ form.first_name(class_="form-control") }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form.last_name.label(class_="col-sm-2 control-label") }}
+            <div class="col-sm-4">
+                {{ form.last_name(class_="form-control") }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form.email.label(class_="col-sm-2 control-label") }}
+            <div class="col-sm-4">
+                {{ form.email(class_="form-control") }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form.date_of_birth.label(class_="col-sm-2 control-label") }}
+            <div class="col-sm-4">
+                {{ form.date_of_birth(class_="form-control") }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form.password.label(class_="col-sm-2 control-label") }}
+            <div class="col-sm-4">
+                {{ form.password(class_="form-control") }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form.confirm.label(class_="col-sm-2 control-label") }}
+            <div class="col-sm-4">
+                {{ form.confirm(class_="form-control") }}
+            </div>
+        </div>
 
         {% if form.errors %}
-            <ul class="errors">
-                {% for field_name, field_errors in form.errors|dictsort if field_errors %}
-                    {% for error in field_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-            </ul>
-         {% endif %}
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4">
+                    <ul class="errors list-unstyled text-danger">
+                        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+                            {% for error in field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
 
-        <p><input type="submit" value="Save"></p>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-4">
+                {% if monkey_self %}
+                    <button type="submit" class="btn btn-default">Save</button>
+                    <button type="reset" class="btn btn-default">Reset</button>
+                    <a href="{{ url_for('delete') }}" class="btn btn-danger">Delete profile</a>
+                {% else %}
+                    <button type="submit" class="btn btn-default">Register</button>
+                {% endif %}
+            </div>
+        </div>
+
     </form>
-
-    {% if monkey_self %}
-        <a href="{{ url_for('delete') }}">Delete profile</a>
-    {% endif %}
 {% endblock %}

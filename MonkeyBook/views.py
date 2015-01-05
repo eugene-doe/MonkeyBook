@@ -152,7 +152,7 @@ def edit():
         if dba.check_unique_email(form['email'].data, monkey_self.id):
             # If no duplicate found:
             if dba.edit_monkey_profile(monkey_self, form):
-                flash('Changes saves')
+                flash('Changes saved')
             else:
                 flash('Error saving changes!')
         else:

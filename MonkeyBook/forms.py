@@ -6,8 +6,8 @@ class LoginForm(Form):
     password = PasswordField('Password', [InputRequired(message='Please enter your password')])
 
 class ProfileEditForm(Form):
-    first_name = StringField('First name', [Length(min=1, max=80, message='Please enter a valid e-mail address')])
-    last_name = StringField('Last name', [Length(min=1, max=80, message='Please enter a valid e-mail address')])
+    first_name = StringField('First name', [Length(min=1, max=80, message='Please enter a valid first name')])
+    last_name = StringField('Last name', [Length(min=1, max=80, message='Please enter a valid last name')])
     email = StringField('E-mail', [Email(message='Please enter a valid e-mail address')])
     date_of_birth = StringField('Date of birth') # Datepicker needed
     password = PasswordField('Password', [InputRequired(message='Please enter your password'),

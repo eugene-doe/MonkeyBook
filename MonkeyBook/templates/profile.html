@@ -1,91 +1,101 @@
 {% extends "layout.html" %}
 {% import "macros.html" as macros %}
 
-{% block content %}
-    <div id="monkey_details">
-        <h1>{{ monkey.first_name }} {{ monkey.last_name }}</h1>
-        {% if monkey == monkey_self %}
-            <h2>That's you!</h2>
-        {% endif %}
-        <p>{{ monkey.email }}</p>
-        {% if monkey.age() and monkey.age() == 1 %}
-            <p>{{ monkey.age() }} year old</p>
-        {% elif monkey.age() and monkey.age() > 1 %}
-            <p>{{ monkey.age() }} years old</p>
-        {% endif %}
-
-        <p id="best_friend">
-            {% if monkey.best_friend %}
-                Best friend: <a href="{{ url_for('profile', monkey_id=monkey.best_friend.id) }}">{{ monkey.best_friend.first_name }} {{ monkey.best_friend.last_name }}</a>
+{% block container %}
+    <div id="profile" class="row">
+        <div class="col-sm-3 h1">
+            <img src="../static/img/suzanne_200px.png" alt="Profile picture" class="img-circle">
+        </div>
+        <div class="col-sm-9">
+            <h1>
+                {{ monkey.first_name }} {{ monkey.last_name }}
                 {% if monkey == monkey_self %}
-                    | <a href="{{ url_for('clear_best') }}" class="change_friendship">Clear</a>
+                    <small>&mdash; That's you!</small>
                 {% endif %}
-            {% else %}
-                {% if monkey == monkey_self %}
-                    You have not chosen a best friend yet.
+            </h1>
+            <p>{{ monkey.email }}</p>
+            {% if monkey.age() and monkey.age() == 1 %}
+                <p>{{ monkey.age() }} year old</p>
+            {% elif monkey.age() and monkey.age() > 1 %}
+                <p>{{ monkey.age() }} years old</p>
+            {% endif %}
+
+            <p id="best_friend">
+                {% if monkey.best_friend %}
+                    Best friend: <a href="{{ url_for('profile', monkey_id=monkey.best_friend.id) }}">{{ monkey.best_friend.first_name }} {{ monkey.best_friend.last_name }}</a>
+                    {% if monkey == monkey_self %}
+                        <a href="{{ url_for('clear_best') }}" class="btn btn-default btn-xs" role="button">Clear</a>
+                    {% endif %}
                 {% else %}
-                    {{ monkey.first_name }} {{ monkey.last_name }} has not chosen a best friend yet.
+                    {% if monkey == monkey_self %}
+                        You have not chosen a best friend yet.
+                    {% else %}
+                        {{ monkey.first_name }} {{ monkey.last_name }} has not chosen a best friend yet.
+                    {% endif %}
                 {% endif %}
+            </p>
+
+            {% if monkey == monkey_self.best_friend %}
+                <p>
+                    {{ monkey.first_name }} {{ monkey.last_name }} is your best friend.
+                    <a href="{{ url_for('clear_best') }}" class="btn btn-default btn-xs" role="button">Not best</a>
+                    <a href="{{ url_for('remove', monkey_id=monkey.id) }}" class="btn btn-default btn-xs btn-warning" role="button">Unfriend</a>
+                </p>
+            {% elif monkey in monkey_self.friends and monkey in monkey_self.friend_of %}
+                <p>
+                    {{ monkey.first_name }} {{ monkey.last_name }} is your mutual friend.
+                    <a href="{{ url_for('best', monkey_id=monkey.id) }}" class="btn btn-default btn-xs" role="button">Best friend</a>
+                    <a href="{{ url_for('remove', monkey_id=monkey.id) }}" class="btn btn-default btn-xs btn-warning" role="button">Unfriend</a>
+                </p>
+            {% elif monkey in monkey_self.friends %}
+                <p>
+                    {{ monkey.first_name }} {{ monkey.last_name }} is your friend.
+                    <a href="{{ url_for('best', monkey_id=monkey.id) }}" class="btn btn-default btn-xs" role="button">Best friend</a>
+                    <a href="{{ url_for('remove', monkey_id=monkey.id) }}" class="btn btn-default btn-xs btn-warning" role="button">Unfriend</a>
+                </p>
+            {% elif monkey in monkey_self.friend_of %}
+                <p>
+                    {{ monkey.first_name }} {{ monkey.last_name }} would like to be your friend.
+                    <a href="{{ url_for('add', monkey_id=monkey.id) }}" class="btn btn-default btn-xs" role="button">Add friend</a>
+                </p>
+            {% elif monkey != monkey_self %}
+                <p>
+                    {{ monkey.first_name }} {{ monkey.last_name }} is not your friend yet.
+                    <a href="{{ url_for('add', monkey_id=monkey.id) }}" class="btn btn-default btn-xs" role="button">Add friend</a>
+                </p>
             {% endif %}
-        </p>
 
-        {% if monkey == monkey_self.best_friend %}
-            <p>
-                {{ monkey.first_name }} {{ monkey.last_name }} is your best friend.
-                <a href="{{ url_for('clear_best') }}" class="change_friendship">Not best anymore</a> |
-                <a href="{{ url_for('remove', monkey_id=monkey.id) }}" class="change_friendship">Unfriend</a>
-            </p>
-        {% elif monkey in monkey_self.friends and monkey in monkey_self.friend_of %}
-            <p>
-                {{ monkey.first_name }} {{ monkey.last_name }} is your mutual friend.
-                <a href="{{ url_for('best', monkey_id=monkey.id) }}" class="change_friendship">Make best friend</a> |
-                <a href="{{ url_for('remove', monkey_id=monkey.id) }}" class="change_friendship">Unfriend</a>
-            </p>
-        {% elif monkey in monkey_self.friends %}
-            <p>
-                {{ monkey.first_name }} {{ monkey.last_name }} is your friend.
-                <a href="{{ url_for('best', monkey_id=monkey.id) }}" class="change_friendship">Make best friend</a> |
-                <a href="{{ url_for('remove', monkey_id=monkey.id) }}" class="change_friendship">Unfriend</a>
-            </p>
-        {% elif monkey in monkey_self.friend_of %}
-            <p>
-                {{ monkey.first_name }} {{ monkey.last_name }} would like to be your friend.
-                <a href="{{ url_for('add', monkey_id=monkey.id) }}" class="change_friendship">Add friend</a>
-            </p>
-        {% elif monkey != monkey_self %}
-            <p>
-                {{ monkey.first_name }} {{ monkey.last_name }} is not your friend yet.
-                <a href="{{ url_for('add', monkey_id=monkey.id) }}" class="change_friendship">Add friend</a>
-            </p>
-        {% endif %}
-    </div>
+            <br>
+            <!-- End of personal details, friend lists begin: -->
 
-    {% if mutual_friends %}
-        <div id="mutual_friends" class="friend_list">
-            <p>Mutual friends:</p>
-            {{ macros.render_monkeys(mutual_friends) }}
-        </div>
-    {% endif %}
-
-    {% if other_friends %}
-        <div id="other_friends" class="friend_list">
             {% if mutual_friends %}
-                <p>Other friends:</p>
-            {% else %}
-                <p>Friends:</p>
+                <div id="mutual_friends">
+                    <h3>Mutual friends:</h3>
+                    {{ macros.render_monkeys(mutual_friends) }}
+                </div>
             {% endif %}
-            {{ macros.render_monkeys(other_friends) }}
-        </div>
-    {% endif %}
 
-    {% if not mutual_friends and not other_friends %}
-        <p>You don't have any friends yet. <a href="{{ url_for('list') }}">Find friends</a> now!</p>
-    {% endif %}
+            {% if other_friends %}
+                <div id="other_friends">
+                    {% if mutual_friends %}
+                        <h3>Other friends:</h3>
+                    {% else %}
+                        <h3>Friends:</h3>
+                    {% endif %}
+                    {{ macros.render_monkeys(other_friends) }}
+                </div>
+            {% endif %}
 
-    {% if also_friend_of %}
-        <div id="also_friend_of" class="friend_list">
-            <p>Also friend of:</p>
-            {{ macros.render_monkeys(also_friend_of) }}
+            {% if not mutual_friends and not other_friends %}
+                <p>You don't have any friends yet. <a href="{{ url_for('list') }}">Find friends</a> now!</p>
+            {% endif %}
+
+            {% if also_friend_of %}
+                <div id="also_friend_of">
+                    <h3>Also friend of:</h3>
+                    {{ macros.render_monkeys(also_friend_of) }}
+                </div>
+            {% endif %}
         </div>
-    {% endif %}
+    </div>
 {% endblock %}

@@ -1,34 +1,53 @@
 ﻿{% extends "bootstrap/base.html" %}
 
-{% block title %}MonkeyBook{% endblock %}
+{% block title %}Monkeybook{% endblock %}
 
 {%- block metas %}
     {{ super() }}
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 {%- endblock metas %}
 
+{%- block styles %}
+    {{ super() }}
+    <link href="../static/css/site.css" rel="stylesheet" media="screen">
+    <link rel="shortcut icon" href="../static/img/favicon.ico">
+{%- endblock styles %}
+
 {% block navbar %}
-    <div id="header">
-        <h2><a href="{{ url_for('index') }}">MonkeyBook</a></h2>
-        {% if monkey_self %}
-            <p>Logged in as <a href="{{ url_for('profile', monkey_id=monkey_self.id) }}">{{ monkey_self.first_name }} {{ monkey_self.last_name }}</a>
-            | <a href="{{ url_for('list') }}">Find friends</a>
-            | <a href="{{ url_for('edit') }}">Edit profile</a>
-            | <a id="logout_link" href="{{ url_for('logout') }}">Log out</a></p>
-        {% endif %}
+    <div id="header" class="navbar navbar-static-top bg-primary">
+        <div class="navbar-inner">
+            <div class="container">
+                <h2 id="site_heading"><a href="{{ url_for('index') }}">monkeybook</a></h2>
+                {% if monkey_self %}
+                    <p>Logged in as <a href="{{ url_for('profile', monkey_id=monkey_self.id) }}">{{ monkey_self.first_name }} {{ monkey_self.last_name }}</a>
+                    | <a href="{{ url_for('list') }}">Find friends</a>
+                    | <a href="{{ url_for('edit') }}">Edit profile</a>
+                    | <a id="logout_link" href="{{ url_for('logout') }}">Log out</a></p>
+                {% else %}
+                    <p>&nbsp;</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-    <div id="flashes">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul>
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-    </div>
+    <!-- Possible improvement: use different styles for error and info messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div id="flashes" class="navbar navbar-static-top bg-info">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <ul class="list-unstyled">
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
 {%- endblock navbar %}
 
-{% block content %}{% endblock %}
+{% block content %}
+    <div id="main" class="container">{% block container %}{% endblock %}</div>
+{% endblock %}
