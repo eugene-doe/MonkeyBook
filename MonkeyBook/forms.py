@@ -12,4 +12,4 @@ class ProfileEditForm(Form):
     date_of_birth = StringField('Date of birth') # Datepicker needed
     password = PasswordField('Password', [InputRequired(message='Please enter your password'),
                                           EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Repeat Password')
+    confirm = PasswordField('Repeat password')
