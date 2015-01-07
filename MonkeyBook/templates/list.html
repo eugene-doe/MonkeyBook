@@ -6,9 +6,12 @@
     <div id="monkey_list">
         <p>
             All monkeys
-            <a href="{{ url_for('list') }}">by name</a> |
-            <a href="{{ url_for('list', order='best_friend') }}">by best friend</a> |
-            <a href="{{ url_for('list', order='friends') }}">by number of friends</a>
+            <a href="{{ url_for('list') }}"
+                class="btn btn-default btn-xs {% if order == None %}active{% endif %}" role="button">by name</a>
+            <a href="{{ url_for('list', order='best_friend') }}"
+                class="btn btn-default btn-xs {% if order == 'best_friend' %}active{% endif %}" role="button">by best friend</a>
+            <a href="{{ url_for('list', order='friends') }}"
+                class="btn btn-default btn-xs {% if order == 'friends' %}active{% endif %}" role="button">by number of friends</a>
         </p>
 
         {{ macros.render_monkeys(monkeys.items) }}
