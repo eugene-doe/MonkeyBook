@@ -126,9 +126,7 @@ for monkey in monkeys:
             monkey.friends.append(potential_friend)
 
     # 2:1 chance of having a best friend
-    if random.randint(0, 2):
-        potential_best_friend = monkeys[random.randint(0, len(monkeys) - 1)]
-        if potential_best_friend is not monkey:
-            monkey.best_friend = potential_best_friend
+    if monkey.friends and random.randint(0, 2):
+        monkey.best_friend = monkey.friends[random.randint(0, len(monkey.friends) - 1)]
 
 db.session.commit()

@@ -87,7 +87,11 @@
             {% endif %}
 
             {% if not mutual_friends and not other_friends %}
-                <p>You don't have any friends yet. <a href="{{ url_for('list') }}">Find friends</a> now!</p>
+                {% if monkey == monkey_self %}
+                    <p>You don't have any friends yet. <a href="{{ url_for('list') }}">Find friends</a> now!</p>
+                {% else %}
+                    <p>This monkey doesn't have any friends yet.</p>
+                {% endif %}
             {% endif %}
 
             {% if also_friend_of %}
