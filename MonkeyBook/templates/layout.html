@@ -1,4 +1,4 @@
-﻿{% extends "bootstrap/base.html" %}
+{% extends "bootstrap/base.html" %}
 
 {% block title %}Monkeybook{% endblock %}
 
@@ -11,7 +11,7 @@
 {%- block styles %}
     {{ super() }}
     <link href="{{ url_for('static', filename='css/site.css') }}" rel="stylesheet" media="screen">
-    <link rel="shortcut icon" href="../static/img/favicon.ico">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 {%- endblock styles %}
 
 {% block navbar %}
