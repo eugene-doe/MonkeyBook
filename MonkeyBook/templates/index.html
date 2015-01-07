@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+﻿{% extends "layout.html" %}
 
 {% block container %}
     {% if monkey_self %}
@@ -7,7 +7,43 @@
             or check the list of <a href="{{ url_for('list') }}">all monkeys</a> to make new friends.</p>
     {% else %}
         <h2>Welcome to Monkeybook!</h2>
-        <p>Please <a href="{{ url_for('login') }}">log in</a>
-            or <a href="{{ url_for('register') }}">register</a> to use the service.</p>
+        <p>
+            Please <a href="{{ url_for('login') }}">log in</a>
+            or <a href="{{ url_for('register') }}">register</a> to use the service.
+        </p>
+
+        <h3>What does it do?</h3>
+        <p>Assuming that you are a monkey, you can:</p>
+        <ul>
+            <li>create a profile on Monkeybook,</li>
+            <li>see your profile,</li>
+            <li>edit your details,</li>
+            <li>see a list of other monkeys,</li>
+            <li>add other monkeys as your friends,</li>
+            <li>set one of your friends as the best friend,</li>
+            <li>remove friends,</li>
+            <li>delete your profile (although why would you?).</li>
+        </ul>
+
+        <h3>Why is it here?</h3>
+        <p>
+            Monkeybook is a simple app designed to showcase the author's skills in web development —
+            and to learn something new in the process!<br>
+            It is written in Python and uses the following technologies:
+        </p>
+        <ul>
+            <li><a href="http://flask.pocoo.org/" target="_blank">Flask</a></li>
+            <li><a href="http://www.sqlalchemy.org/" target="_blank">SQLAlchemy</a></li>
+            <li><a href="http://www.postgresql.org/" target="_blank">PostgreSQL</a></li>
+            <li><a href="http://wtforms.readthedocs.org/" target="_blank">WTForms</a></li>
+            <li><a href="http://www.getbootstrap.com/" target="_blank">Bootstrap</a></li>
+            <li><a href="http://pytest.org/" target="_blank">pytest</a></li>
+        </ul>
+
+        <h3>Want to know more?</h3>
+        <ul>
+            <li>See the code on <a href="https://github.com/eugene-doe/MonkeyBook">GitHub</a></li>
+            <li>Contact the author: evgenii.dobrianskii@myy.haaga-helia.fi</li>
+        </ul>
     {% endif %}
 {% endblock %}

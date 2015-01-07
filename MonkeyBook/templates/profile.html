@@ -1,16 +1,16 @@
-{% extends "layout.html" %}
+﻿{% extends "layout.html" %}
 {% import "macros.html" as macros %}
 
 {% block container %}
     <div id="profile" class="row">
         <div class="col-sm-3 h1">
-            <img src="../static/img/suzanne_200px.png" alt="Profile picture" class="img-circle">
+            <img src="../static/img/suzanne_200px.png" alt="Profile picture" title="Real user profile pictures were out of scope this time :)" class="img-circle">
         </div>
         <div class="col-sm-9">
             <h1>
                 {{ monkey.first_name }} {{ monkey.last_name }}
                 {% if monkey == monkey_self %}
-                    <small>&mdash; That's you!</small>
+                    <small>— That's you!</small>
                 {% endif %}
             </h1>
             <p>{{ monkey.email }}</p>
@@ -56,12 +56,12 @@
             {% elif monkey in monkey_self.friend_of %}
                 <p>
                     {{ monkey.first_name }} {{ monkey.last_name }} would like to be your friend.
-                    <a href="{{ url_for('add', monkey_id=monkey.id) }}" class="btn btn-default btn-xs" role="button">Add friend</a>
+                    <a href="{{ url_for('add', monkey_id=monkey.id) }}" class="btn btn-info btn-xs" role="button">Add friend</a>
                 </p>
             {% elif monkey != monkey_self %}
                 <p>
                     {{ monkey.first_name }} {{ monkey.last_name }} is not your friend yet.
-                    <a href="{{ url_for('add', monkey_id=monkey.id) }}" class="btn btn-default btn-xs" role="button">Add friend</a>
+                    <a href="{{ url_for('add', monkey_id=monkey.id) }}" class="btn btn-info btn-xs" role="button">Add friend</a>
                 </p>
             {% endif %}
 

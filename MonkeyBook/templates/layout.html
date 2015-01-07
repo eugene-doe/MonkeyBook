@@ -5,11 +5,12 @@
 {%- block metas %}
     {{ super() }}
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="robots" content="noindex">
 {%- endblock metas %}
 
 {%- block styles %}
     {{ super() }}
-    <link href="../static/css/site.css" rel="stylesheet" media="screen">
+    <link href="{{ url_for('static', filename='css/site.css') }}" rel="stylesheet" media="screen">
     <link rel="shortcut icon" href="../static/img/favicon.ico">
 {%- endblock styles %}
 
@@ -19,12 +20,17 @@
             <div class="container">
                 <h2 id="site_heading"><a href="{{ url_for('index') }}">monkeybook</a></h2>
                 {% if monkey_self %}
-                    <p>Logged in as <a href="{{ url_for('profile', monkey_id=monkey_self.id) }}">{{ monkey_self.first_name }} {{ monkey_self.last_name }}</a>
-                    | <a href="{{ url_for('list') }}">Find friends</a>
-                    | <a href="{{ url_for('edit') }}">Edit profile</a>
-                    | <a id="logout_link" href="{{ url_for('logout') }}">Log out</a></p>
+                    <p>
+                        Logged in as <a href="{{ url_for('profile', monkey_id=monkey_self.id) }}">{{ monkey_self.first_name }} {{ monkey_self.last_name }}</a>
+                        | <a href="{{ url_for('list') }}">Find friends</a>
+                        | <a href="{{ url_for('edit') }}">Edit profile</a>
+                        | <a id="logout_link" href="{{ url_for('logout') }}">Log out</a>
+                    </p>
                 {% else %}
-                    <p>&nbsp;</p>
+                    <p>
+                        <a href="{{ url_for('login') }}">Log in</a>
+                        | <a href="{{ url_for('register') }}">Register</a>
+                    </p>
                 {% endif %}
             </div>
         </div>
