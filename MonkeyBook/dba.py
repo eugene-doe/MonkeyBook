@@ -149,8 +149,8 @@ def list_monkeys(order=None, page=1):
     # Sorting is done by tuples, so that first name, last name and number of friends are taken into account
     # in all sorting modes (but in different order).
     
-    # friend_count==0 evaluates to True when a monkey has no best friend specified. This makes sure that
-    # the monkeys with best friends are listed first (since False < True).
+    # friend_count==0 evaluates to True when a monkey has no friends specified. This makes sure that
+    # the monkeys with friends are listed first (since False < True).
 
     subquery = db.session.query(friendship.c.left_monkey_id, func.count('*').\
         label('friend_count')).group_by(friendship.c.left_monkey_id).subquery()
