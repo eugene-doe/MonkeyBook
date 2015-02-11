@@ -3,6 +3,7 @@ This script runs the MonkeyBook application using a development server.
 """
 
 from os import environ
+
 from MonkeyBook import app
 
 if __name__ == '__main__':

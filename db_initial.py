@@ -1,3 +1,7 @@
+"""
+Initial test data.
+"""
+
 # >>> exec(open("db_initial.py").read())
 
 from MonkeyBook.models import db

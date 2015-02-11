@@ -1,8 +1,13 @@
+"""
+Additional test data.
+"""
+
 # >>> exec(open("db_additional.py").read())
+
+import random
 
 from MonkeyBook.models import db
 from MonkeyBook.models import Monkey
-import random
 
 names = ['Amanda Blake',         
          'Jamie Ortiz',          
@@ -112,8 +117,11 @@ for name in names:
     monkey = Monkey(name_split[0],
                     name_split[1],
                     '123',
-                    name_split[0].lower() + '.' + name_split[1].lower() + '@email.com',
-                    str(random.randint(1950, 2014)) + '-' + str(random.randint(1, 12)) + '-' + str(random.randint(1, 28)))
+                    name_split[0].lower() +
+                        '.' + name_split[1].lower() + '@email.com',
+                    str(random.randint(1950, 2014)) + '-' +
+                        str(random.randint(1, 12)) + '-' +
+                        str(random.randint(1, 28)))
     monkeys.append(monkey)
 
 for monkey in monkeys:
@@ -122,11 +130,13 @@ for monkey in monkeys:
     # Up to 20 friends
     for i in range(random.randint(0, 20)):
         potential_friend = monkeys[random.randint(0, len(monkeys) - 1)]
-        if potential_friend is not monkey and potential_friend not in monkey.friends:
-            monkey.friends.append(potential_friend)
+        if potential_friend is not monkey and \
+            potential_friend not in monkey.friends:
+                monkey.friends.append(potential_friend)
 
     # 2:1 chance of having a best friend
     if monkey.friends and random.randint(0, 2):
-        monkey.best_friend = monkey.friends[random.randint(0, len(monkey.friends) - 1)]
+        monkey.best_friend = \
+            monkey.friends[random.randint(0, len(monkey.friends) - 1)]
 
 db.session.commit()
