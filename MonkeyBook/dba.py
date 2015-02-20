@@ -88,6 +88,7 @@ def delete_monkey(monkey):
 
 
 def get_monkey_profile(monkey):
+    """Get monkey's profile."""
     try:
         mutual_friends = set(monkey.friends).intersection(monkey.friend_of)
         other_friends = set(monkey.friends).difference(monkey.friend_of)
@@ -131,6 +132,8 @@ def edit_monkey_profile(monkey, form):
     except Exception as e:
         if type(e) is ValueError:
             form.date_of_birth.errors.append('Incorrect date format')
+        # Roll back all other changes to the monkey:
+        db.session.rollback()
         return False
 
     # Handling database errors (e.g. database not available):
@@ -144,7 +147,7 @@ def edit_monkey_profile(monkey, form):
 def add_friend(monkey, friend):
     """Add a friend to a monkey."""
     try:
-        if friend is monkey or friend in monkey.friends:
+        if not friend or friend is monkey or friend in monkey.friends:
             return False
 
         monkey.friends.append(friend)
@@ -187,6 +190,7 @@ def set_best_friend(monkey, best_friend):
 def clear_best_friend(monkey):
     """Clear monkey's best friend."""
     try:
+        monkey.best_friend = None
         monkey.best_friend_id = None
         db.session.commit()
         return True
@@ -194,7 +198,15 @@ def clear_best_friend(monkey):
         return False
 
 
-def list_monkeys(order=None, page=1):
+def count_monkeys():
+    """Count monkeys."""
+    try:
+        return Monkey.query.count()
+    except Exception:
+        return -1
+
+
+def list_monkeys(order=None, page=1, monkeys_per_page=10):
     """List all monkeys."""
 
     # Sorting is done by tuples, so that first name, last name and
@@ -213,8 +225,6 @@ def list_monkeys(order=None, page=1):
 
         m_alias = aliased(Monkey)
 
-        monkeys_per_page = 10
-    
         if order == 'best_friend':
             monkeys = Monkey.query.outerjoin(
                     subquery, Monkey.id==subquery.c.left_monkey_id).\

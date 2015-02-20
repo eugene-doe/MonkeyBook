@@ -12,11 +12,12 @@ The views module.
 # to the template, because monkey_self is used in layout.html.
 
 import os
+import math
 from datetime import date
 from functools import wraps
 
 from flask import (Flask, session, redirect, url_for, escape, request,
-                   render_template, flash)
+                   render_template, flash, abort)
 from sqlalchemy import func, and_, desc
 from sqlalchemy.orm import aliased
 from dateutil import parser
@@ -107,6 +108,8 @@ def register():
 def delete(confirmed=None):
     """Delete monkey's profile."""
     monkey_self = dba.get_monkey_by_id(session['id'])
+    if monkey_self is None:
+        return redirect(url_for('index'))
 
     if confirmed == 'confirmed':
         if dba.delete_monkey(monkey_self):
@@ -135,6 +138,8 @@ def index():
 def profile(monkey_id):
     """Display a monkey's profile, own or not."""
     monkey_self = dba.get_monkey_by_id(session['id'])
+    if monkey_self is None:
+        return redirect(url_for('index'))
 
     # This condition avoids running a second query when viewing own
     # profile:
@@ -164,6 +169,8 @@ def profile(monkey_id):
 def edit():
     """Edit monkey's own profile."""
     monkey_self = dba.get_monkey_by_id(session['id'])
+    if monkey_self is None:
+        return redirect(url_for('index'))
 
     # If no formdata is present in the request, the form is populated
     # from the object:
@@ -241,10 +248,30 @@ def clear_best():
 @login_required
 def list(order=None, page=1):
     """List all monkeys."""
+    # Handling unacceptable sort orders:
+    if order is not None and order not in ['best_friend', 'friends']:
+        return redirect(url_for('list'))
+
+    # Counting pages:
+    monkeys_per_page = 10
+    page_count = math.ceil(dba.count_monkeys() / monkeys_per_page)
+    
+    # At least one page must always be present:
+    if page_count < 1:
+        page_count = 1
+
+    # Handling unacceptable page numbers:
+    if page < 1 or page > page_count:
+        return redirect(url_for('list'))
+
     monkey_self = dba.get_monkey_by_id(session['id'])
-    monkeys = dba.list_monkeys(order, page)   
+    monkeys = dba.list_monkeys(order, page, monkeys_per_page)
+    if monkey_self is None or monkeys is None:
+        return redirect(url_for('index'))
+
     return render_template('list.html', monkeys=monkeys,
-                           monkey_self=monkey_self, order=order)
+                            monkey_self=monkey_self, order=order)
+
 
 # Randomly generated secret key
 app.secret_key = os.urandom(24)

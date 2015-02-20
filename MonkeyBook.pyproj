@@ -41,7 +41,8 @@
     <Compile Include="runserver.py" />
     <Compile Include="MonkeyBook\__init__.py" />
     <Compile Include="MonkeyBook\views.py" />
-    <Compile Include="tests\test_app.py" />
+    <Compile Include="tests\test_views.py" />
+    <Compile Include="tests\test_models.py" />
     <Compile Include="tests\conftest.py">
       <SubType>Code</SubType>
     </Compile>

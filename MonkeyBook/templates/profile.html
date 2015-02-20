@@ -70,18 +70,28 @@
 
             {% if mutual_friends %}
                 <div id="mutual_friends">
-                    <h3>Mutual friends:</h3>
+                    <h3>
+                        Mutual friends:
+                        {% if monkey == monkey_self %}
+                            <br><small>You list them as friends, and vice versa</small>
+                        {% endif %}
+                    </h3>
                     {{ macros.render_monkeys(mutual_friends) }}
                 </div>
             {% endif %}
 
             {% if other_friends %}
                 <div id="other_friends">
-                    {% if mutual_friends %}
-                        <h3>Other friends:</h3>
-                    {% else %}
-                        <h3>Friends:</h3>
-                    {% endif %}
+                    <h3>
+                        {% if mutual_friends %}
+                            Other friends:
+                        {% else %}
+                            Friends:
+                        {% endif %}
+                        {% if monkey == monkey_self %}
+                            <br><small>You list them as friends, but they haven't befriended you yet</small>
+                        {% endif %}
+                    </h3>
                     {{ macros.render_monkeys(other_friends) }}
                 </div>
             {% endif %}
@@ -96,7 +106,12 @@
 
             {% if also_friend_of %}
                 <div id="also_friend_of">
-                    <h3>Also friend of:</h3>
+                    <h3>
+                        Also friend of:
+                        {% if monkey == monkey_self %}
+                            <br><small>They list you as friends, but you haven't befriended them yet</small>
+                        {% endif %}
+                    </h3>
                     {{ macros.render_monkeys(also_friend_of) }}
                 </div>
             {% endif %}
