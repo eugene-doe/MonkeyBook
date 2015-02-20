@@ -7,10 +7,10 @@ from os import environ
 from MonkeyBook import app
 
 if __name__ == '__main__':
-    if environ.get('windir'):
-        HOST = 'localhost' # Running on Windows
-    else:
+    if environ.get('HEROKU'):
         HOST = '0.0.0.0' # Running on Heroku
+    else:
+        HOST = 'localhost' # Running locally
     try:
         PORT = int(environ.get('PORT', '8080'))
     except ValueError:
